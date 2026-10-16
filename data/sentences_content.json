@@ -1,0 +1,128 @@
+{
+  "curriculum_metadata": {
+    "version": "2026.1.0",
+    "total_lessons": 6,
+    "passing_score": 100,
+    "passing_criteria": "Mastery Level 3 requires AI approval."
+  },
+  "lessons": [
+    {
+      "id": "simple",
+      "title": "Simple Sentences: The Foundation",
+      "teaching_content": "A simple sentence contains one independent clause. It expresses a single complete thought with a subject and a verb. Example: 'The cat slept.'",
+      "prerequisite_id": null,
+      "practice": {
+        "level_1_mcq": [
+          {
+            "id": 101,
+            "question": "Which of the following is a simple sentence?",
+            "options": [
+              "A. I ran and she walked.",
+              "B. The sun is shining.",
+              "C. Because it was raining, I stayed home."
+            ],
+            "answer": "B"
+          }
+        ],
+        "level_2_jumbled": [
+          {
+            "id": 102,
+            "parts": ["my homework", "I finished", "quickly"],
+            "correct_sequence": ["I finished", "my homework", "quickly"]
+          }
+        ],
+        "level_3_prompt": [
+          {
+            "id": 103,
+            "prompt_text": "Write a simple sentence describing a moment of surprise."
+          }
+        ]
+      }
+    },
+    {
+      "id": "compound",
+      "title": "Compound Sentences: Combining Thoughts",
+      "teaching_content": "A compound sentence joins two independent clauses using a coordinating conjunction (FANBOYS: for, and, nor, but, or, yet, so). Example: 'The cat slept, and the dog played.'",
+      "prerequisite_id": "simple",
+      "practice": {
+        "level_1_mcq": [
+          {
+            "id": 201,
+            "question": "Which conjunction is best? 'I wanted tea, ___ the shop was closed.'",
+            "options": ["A. but", "B. so", "C. nor"],
+            "answer": "A"
+          }
+        ],
+        "level_2_jumbled": [
+          {
+            "id": 202,
+            "parts": ["It was cold", "so", "I wore a coat"],
+            "correct_sequence": ["It was cold", "so", "I wore a coat"]
+          }
+        ],
+        "level_3_prompt": [
+          {
+            "id": 203,
+            "prompt_text": "Write a compound sentence about two different foods you enjoy using 'and' or 'but'."
+          }
+        ]
+      }
+    },
+    {
+      "id": "complex",
+      "title": "Complex Sentences: Adding Subordination",
+      "teaching_content": "A complex sentence combines one independent clause with at least one dependent clause (using 'because', 'although', 'if'). Example: 'Because it rained, the grass grew.'",
+      "prerequisite_id": "compound",
+      "practice": {
+        "level_3_prompt": [
+          {
+            "id": 303,
+            "prompt_text": "Write a complex sentence starting with 'Although' about your daily routine."
+          }
+        ]
+      }
+    },
+    {
+      "id": "compound-complex",
+      "title": "The Master Sentence",
+      "teaching_content": "This sentence has at least two independent clauses and one or more dependent clauses. Example: 'Although I like tea, I drank coffee, and my friend had juice.'",
+      "prerequisite_id": "complex",
+      "practice": {
+        "level_3_prompt": [
+          {
+            "id": 403,
+            "prompt_text": "Write a sentence that uses 'Because', 'and', and two different actions."
+          }
+        ]
+      }
+    },
+    {
+      "id": "paragraph",
+      "title": "Paragraph Construction: Variety and Flow",
+      "teaching_content": "A paragraph should be 3-5 sentences long. It must have variety: use at least two different sentence types from the ones you've learned.",
+      "prerequisite_id": "compound-complex",
+      "practice": {
+        "level_3_prompt": [
+          {
+            "id": 501,
+            "prompt_text": "Write a 3-5 sentence paragraph about your favorite place. Hint: Use a mix of simple and compound sentences."
+          }
+        ]
+      }
+    },
+    {
+      "id": "genre",
+      "title": "Genre Specific: Formal Applications",
+      "teaching_content": "Now we apply your skills to real-world writing, such as letters, reports, and applications.",
+      "prerequisite_id": "paragraph",
+      "practice": {
+        "level_3_prompt": [
+          {
+            "id": 601,
+            "prompt_text": "Write a short 5-sentence application for a day's leave from school."
+          }
+        ]
+      }
+    }
+  ]
+}

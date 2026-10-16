@@ -1,0 +1,169 @@
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg-main: #f1f5f9;
+  --sidebar-w: 280px;
+  --border-color: #e2e8f0;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+}
+
+/* 1. Base Layout Structures */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--bg-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.app-header {
+  height: 64px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.app-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden; 
+}
+
+/* 2. Sidebar & Progress Section */
+.sidebar h3 {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin: 2rem 0 1rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.progress-widget {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem 1rem; /* More vertical space */
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.lesson-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 0.5rem;
+}
+
+/* 3. Main Stage & WritingPad Views */
+.main-stage {
+  flex: 1;
+  padding: 2.5rem;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.writing-container {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Tab Menu Styling */
+.tab-menu {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.tab, .active-tab {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.tab { color: var(--text-muted); }
+.tab:hover { background: #e2e8f0; }
+
+.active-tab {
+  background: var(--primary);
+  color: white;
+}
+
+/* 4. Feedback & Instructions */
+.instruction-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 5px solid var(--primary);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+.feedback-msg {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.feedback-msg.success {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.feedback-msg.fail {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* 5. Utility UI */
+.welcome-screen {
+  text-align: center;
+  margin-top: 10%;
+  color: var(--text-muted);
+}
+
+.welcome-screen h2 {
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover { background: var(--primary-hover); }
