@@ -44,7 +44,11 @@ wrong tense, subject-verb agreement, wrong word form, missing/extra article, wro
 Do NOT use "grammar" for stylistic suggestions such as "vary your sentences",
 "add more detail", "this could be clearer", or "consider restructuring".
 Those belong under "structure" or "clarity". If the grammar is correct,
-do not flag "grammar" at all.
+do not flag "grammar" at all. 
+
+CRITICAL: If the text has no grammar errors but is poorly written or hard to understand,
+you MUST include at least one issue with category "clarity" and at least one with "structure".
+Never omit "clarity" if the text needs improvement in readability.
 
 2. NON-ENGLISH INPUT.
 If the submission is not in English (for example, written in Urdu script),
