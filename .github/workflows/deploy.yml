@@ -34,6 +34,7 @@ jobs:
 
       - name: Build and push image (tagged with commit SHA)
         run: |
+          gcloud config set billing/quota_project "$PROJECT_ID"
           IMAGE="$IMAGE_REPO:$GITHUB_SHA"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
           gcloud builds submit --tag "$IMAGE" --project "$PROJECT_ID" ai-service/
