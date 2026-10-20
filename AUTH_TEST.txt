@@ -1,2 +1,0 @@
-Temporary file to verify Colab -> GitHub push works.
-Safe to delete.
