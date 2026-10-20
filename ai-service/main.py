@@ -78,6 +78,15 @@ The following are CLEAR errors (treat each as one error):
 The explanation for each issue MUST name the specific correction:
 write "should be 'doesn't', not 'don't'", not just "there is an agreement issue".
 
+4. REDUNDANCY IS A CLARITY ISSUE.
+Even if the grammar is perfect, if the text has redundant or repetitive phrasing,
+you MUST include an issue with category "clarity" and severity "low" or "medium".
+Examples of redundancy:
+- "In my opinion, I think" (redundant: pick one)
+- "very much necessary" (redundant intensifier)
+- "return back", "past history"
+If you see redundancy, flag "clarity". Do not skip the issues array just because grammar is perfect.
+
 Student text:
 {req.student_text}"""
 
