@@ -30,7 +30,7 @@ def get_feedback(req: FeedbackRequest) -> FeedbackResponse:
     prompt = f"""Evaluate this English writing sample from a Pakistani student at level {req.level}/7.
 
 Return structured feedback:
-- overall_score: 0 (ALWAYS return 0 for this test)
+- overall_score: 0-100
 - issues: up to 5 prioritized issues, each with category (grammar/vocabulary/structure/clarity),
   severity (low/medium/high), explanation (1-2 sentences), and example (exact phrase from the text)
 - rewrite_suggestion: one improved sentence or short paragraph
@@ -120,4 +120,4 @@ def feedback(req: FeedbackRequest):
         raise HTTPException(status_code=502, detail="Upstream model error")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal error")
-test: deliberate break to verify gate protection
+
