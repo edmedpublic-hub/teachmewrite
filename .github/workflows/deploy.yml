@@ -32,14 +32,16 @@ jobs:
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Configure Docker auth for Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+
       - name: Build and push image (tagged with commit SHA)
         run: |
-          gcloud config set billing/quota_project "$PROJECT_ID"
           IMAGE="$IMAGE_REPO:$GITHUB_SHA"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
-          gcloud builds submit --tag "$IMAGE" --project "$PROJECT_ID" \
-            --gcs-source-staging-dir="gs://teachmewrite-prod_cloudbuild/source" \
-            ai-service/
+          docker build -t "$IMAGE" ai-service/
+          docker push "$IMAGE"
 
       - name: Deploy to Cloud Run (no traffic, staging tag)
         run: |
