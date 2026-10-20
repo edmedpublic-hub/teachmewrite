@@ -37,7 +37,9 @@ jobs:
           gcloud config set billing/quota_project "$PROJECT_ID"
           IMAGE="$IMAGE_REPO:$GITHUB_SHA"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
-          gcloud builds submit --tag "$IMAGE" --project "$PROJECT_ID" ai-service/
+          gcloud builds submit --tag "$IMAGE" --project "$PROJECT_ID" \
+            --gcs-source-staging-dir="gs://teachmewrite-prod_cloudbuild/source" \
+            ai-service/
 
       - name: Deploy to Cloud Run (no traffic, staging tag)
         run: |
