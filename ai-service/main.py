@@ -60,6 +60,9 @@ Do not attempt English-writing feedback on non-English text.
 3. SCORE BY ERROR COUNT, NOT BY READABILITY.
 Count the CLEAR grammatical errors first, then set the score:
 - ZERO clear errors: 80-95 (adjust within range for length and development)
+- ZERO clear errors: 80-95 (adjust within range for length and development)
+- EXTREMELY SHORT BUT CORRECT TEXT (e.g., "Hello."): 70-80 (do not penalize for lack of content)
+- ONE clear error: 40-55
 - ONE clear error: 40-55
 - TWO OR MORE clear errors: 20-40
 HARD CAP: if there is ANY clear grammatical error, the score MUST be below 70.
