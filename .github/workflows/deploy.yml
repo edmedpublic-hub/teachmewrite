@@ -4,17 +4,17 @@ on:
   push:
     branches: [main]
     paths: ['ai-service/**']
-  workflow_dispatch:  # allow manual trigger for the deliberate-break test
+  workflow_dispatch:
 
 permissions:
   contents: read
-  id-token: write   # REQUIRED for WIF: lets the workflow request a GitHub OIDC token
+  id-token: write
 
 env:
   PROJECT_ID: teachmewrite-prod
   REGION: asia-south1
   SERVICE: teachmewrite-ai
-  REPO: asia-south1-docker.pkg.dev/teachmewrite-prod/teachmewrite-ai/teachmewrite-ai
+  IMAGE_REPO: asia-south1-docker.pkg.dev/teachmewrite-prod/teachmewrite-ai/teachmewrite-ai
 
 jobs:
   deploy:
@@ -34,18 +34,15 @@ jobs:
 
       - name: Build and push image (tagged with commit SHA)
         run: |
-          IMAGE="${ env.REPO }:${ github.sha }"
-          gcloud builds submit \
-            --tag "$IMAGE" \
-            --project "${ env.PROJECT_ID }" \
-            ai-service/
+          IMAGE="$IMAGE_REPO:$GITHUB_SHA"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+          gcloud builds submit --tag "$IMAGE" --project "$PROJECT_ID" ai-service/
 
       - name: Deploy to Cloud Run (no traffic, staging tag)
         run: |
-          gcloud run deploy "${ env.SERVICE }" \
-            --image "${ env.IMAGE }" \
-            --region "${ env.REGION }" \
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE" \
+            --region "$REGION" \
             --platform managed \
             --allow-unauthenticated \
             --set-secrets ANTHROPIC_API_KEY=anthropic-api-key:latest \
@@ -55,19 +52,18 @@ jobs:
             --timeout 120 \
             --no-traffic \
             --tag staging \
-            --project "${ env.PROJECT_ID }"
-          # Capture the staging URL for the gate step
-          STAGING_URL=$(gcloud run services describe "${ env.SERVICE }" \
-            --region "${ env.REGION }" \
-            --project "${ env.PROJECT_ID }" \
+            --project "$PROJECT_ID"
+          STAGING_URL=$(gcloud run services describe "$SERVICE" \
+            --region "$REGION" \
+            --project "$PROJECT_ID" \
             --format='value(status.traffic[?(@.tag=="staging")].url)' | head -n1)
           echo "STAGING_URL=$STAGING_URL" >> "$GITHUB_ENV"
 
       - name: Wait for staging to be ready
         run: |
           for i in $(seq 1 30); do
-            if curl -sf "${ env.STAGING_URL }/health" > /dev/null; then
-              echo "Staging ready at ${ env.STAGING_URL }"; exit 0
+            if curl -sf "$STAGING_URL/health" > /dev/null; then
+              echo "Staging ready at $STAGING_URL"; exit 0
             fi
             echo "waiting... ($i/30)"; sleep 3
           done
@@ -76,21 +72,20 @@ jobs:
       - name: Run golden-set gate (3 runs, 2-of-3 rule)
         run: |
           pip install -r ai-service/requirements-gate.txt
-          python ai-service/run_gate.py "${ env.STAGING_URL }" \
-            --runs 3 --threshold 2 --out gate_result.json
+          python ai-service/run_gate.py "$STAGING_URL" --runs 3 --threshold 2 --out gate_result.json
 
       - name: Promote staging to 100% traffic (only if gate passed)
         run: |
-          gcloud run services update-traffic "${ env.SERVICE }" \
-            --region "${ env.REGION }" \
-            --project "${ env.PROJECT_ID }" \
+          gcloud run services update-traffic "$SERVICE" \
+            --region "$REGION" \
+            --project "$PROJECT_ID" \
             --to-latest
-          echo "Promoted ${ env.IMAGE } to 100% traffic."
+          echo "Promoted $IMAGE to 100% traffic."
 
       - name: Upload gate result artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gate-result-${ github.sha }
+          name: gate-result-${{ github.sha }}
           path: gate_result.json
           if-no-files-found: ignore
