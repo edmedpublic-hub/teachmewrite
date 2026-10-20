@@ -49,7 +49,8 @@ jobs:
 
       - name: Deploy to Cloud Run (no traffic, staging tag)
         run: |
-          gcloud run deploy "$SERVICE" \
+          # 1. Deploy and capture the base service URL directly from deploy output
+          BASE_URL=$(gcloud run deploy "$SERVICE" \
             --image "$IMAGE" \
             --region "$REGION" \
             --platform managed \
@@ -61,22 +62,36 @@ jobs:
             --timeout 120 \
             --no-traffic \
             --tag staging \
-            --project "$PROJECT_ID"
-          STAGING_URL=$(gcloud run services describe "$SERVICE" \
-            --region "$REGION" \
             --project "$PROJECT_ID" \
-            --format='value(status.traffic[?(@.tag=="staging")].url)' | head -n1)
+            --format="value(status.url)")
+
+          # 2. Construct the tagged URL manually: https://staging---<base_url_domain>
+          STAGING_URL=$(echo "$BASE_URL" | sed 's|https://|https://staging---|')
+          
+          echo "Constructed Staging URL: $STAGING_URL"
           echo "STAGING_URL=$STAGING_URL" >> "$GITHUB_ENV"
 
       - name: Wait for staging to be ready
         run: |
+          if [ -z "$STAGING_URL" ]; then
+            echo "ERROR: STAGING_URL is empty. Cannot proceed."
+            exit 1
+          fi
+
           for i in $(seq 1 30); do
-            if curl -sf "$STAGING_URL/health" > /dev/null; then
-              echo "Staging ready at $STAGING_URL"; exit 0
+            # -s silent, -o discard output, -w print HTTP code. || true prevents early exit.
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$STAGING_URL/health" || true)
+            
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "Staging ready at $STAGING_URL (HTTP 200)"
+              exit 0
             fi
-            echo "waiting... ($i/30)"; sleep 3
+            
+            echo "waiting... ($i/30) - Last HTTP status: $HTTP_STATUS"
+            sleep 3
           done
-          echo "staging did not become healthy in 90s"; exit 1
+          echo "ERROR: staging did not become healthy in 90s"
+          exit 1
 
       - name: Run golden-set gate (3 runs, 2-of-3 rule)
         run: |
