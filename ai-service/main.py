@@ -109,7 +109,7 @@ Student text:
     )
     if response.parsed_output is None:
         raise ValueError(f"Model output did not match schema. stop_reason={response.stop_reason}")
-    
+    result = response.parsed_output    
     # --- PII SANITIZATION FIREWALL ---
     # --- SECURITY FIREWALL ---
     import re
