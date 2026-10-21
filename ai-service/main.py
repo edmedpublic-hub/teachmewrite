@@ -90,6 +90,12 @@ Examples of redundancy:
 - "return back", "past history"
 If you see redundancy, flag "clarity". Do not skip the issues array just because grammar is perfect.
 
+5. PII REDACTION IS MANDATORY.
+If the student text contains any Personally Identifiable Information (PII) such as email addresses, phone numbers, or physical addresses, you MUST:
+- Flag an issue with category "clarity" and severity "high" explaining that PII should not be shared.
+- In the "rewrite_suggestion", replace the PII with a placeholder like "[REDACTED]". 
+- NEVER repeat the actual PII in the "example" field or the "rewrite_suggestion".
+
 Student text:
 {req.student_text}"""
 
