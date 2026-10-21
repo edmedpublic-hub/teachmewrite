@@ -93,11 +93,12 @@ jobs:
           echo "ERROR: staging did not become healthy in 90s"
           exit 1
 
-      - name: Run golden-set gate (3 runs, 2-of-3 rule)
+      - name: Run golden-set gate (3 runs, 2-of-3 rule, with LLM Judge)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           pip install -r ai-service/requirements-gate.txt
-          python ai-service/run_gate.py "$STAGING_URL" --runs 3 --threshold 2 --out gate_result.json
-
+          python ai-service/run_gate.py "$STAGING_URL" --runs 3 --threshold 2 --judge --min-helpfulness 3 --out gate_result.json
       - name: Promote staging to 100% traffic (only if gate passed)
         run: |
           gcloud run services update-traffic "$SERVICE" \
