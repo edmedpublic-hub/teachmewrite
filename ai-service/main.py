@@ -111,6 +111,9 @@ Student text:
         raise ValueError(f"Model output did not match schema. stop_reason={response.stop_reason}")
     
     # --- PII SANITIZATION FIREWALL ---
+    # --- SECURITY FIREWALL ---
+    import re
+    
     # 1. Toxicity Check (Failsafe: wipe example if toxic words found)
     toxic_words = ["hate", "stupid", "kill", "die", "idiot", "dumb"]
     for issue in result.issues:
