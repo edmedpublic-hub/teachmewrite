@@ -111,10 +111,15 @@ Student text:
         raise ValueError(f"Model output did not match schema. stop_reason={response.stop_reason}")
     
     # --- PII SANITIZATION FIREWALL ---
-    # Regex for phone numbers (basic Pakistani/international) and emails
+    # 1. Toxicity Check (Failsafe: wipe example if toxic words found)
+    toxic_words = ["hate", "stupid", "kill", "die", "idiot", "dumb"]
+    for issue in result.issues:
+        if any(word in issue.example.lower() for word in toxic_words):
+            issue.example = "[TOXIC CONTENT REDACTED]"
+            
+    # 2. PII Redaction (Deterministic regex)
     pii_pattern = re.compile(r'([\w\.-]+@[\w\.-]+\.\w+)|(\b\d{4}[-\s]?\d{7}\b)')
     
-    result = response.parsed_output
     for issue in result.issues:
         issue.explanation = pii_pattern.sub('[REDACTED]', issue.explanation)
         issue.example = pii_pattern.sub('[REDACTED]', issue.example)
