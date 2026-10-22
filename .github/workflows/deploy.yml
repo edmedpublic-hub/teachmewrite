@@ -78,7 +78,7 @@ jobs:
             exit 1
           fi
 
-          for i in $(seq 1 30); do
+          for i in $(seq 1 50); do
             # -s silent, -o discard output, -w print HTTP code. || true prevents early exit.
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$STAGING_URL/health" || true)
             
@@ -87,10 +87,10 @@ jobs:
               exit 0
             fi
             
-            echo "waiting... ($i/30) - Last HTTP status: $HTTP_STATUS"
+            echo "waiting... ($i/50) - Last HTTP status: $HTTP_STATUS"
             sleep 3
           done
-          echo "ERROR: staging did not become healthy in 90s"
+          echo "ERROR: staging did not become healthy in 150s"
           exit 1
 
       - name: Run golden-set gate (3 runs, 2-of-3 rule, with LLM Judge)
