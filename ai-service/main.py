@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, ValidationError
 from typing import Literal
 from anthropic import Anthropic, APIError
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # --- Schemas (mirror of Cell 1d, duplicated because the service must be standalone) ---
 class FeedbackRequest(BaseModel):
@@ -159,6 +160,9 @@ Student text:
 
 # --- FastAPI ---
 app = FastAPI(title="TeachMeWrite AI Feedback", version="0.1.0")
+
+# --- Prometheus metrics ---
+Instrumentator().instrument(app).expose(app)
 
 @app.get("/health")
 def health():
