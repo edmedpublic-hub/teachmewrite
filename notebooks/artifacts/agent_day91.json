@@ -1,0 +1,8 @@
+{
+  "student_text": "I am agree with my father that education is more better than money.",
+  "level": 5,
+  "agent_response": "Great effort! I can see you're expressing a meaningful idea. I'd like to help you improve two grammar issues.\n\nLet me start with the first one:\n\n**Look at this phrase: \"I am agree\"**\n\nThink about this: when you say \"I am,\" you're adding an auxiliary verb. Can you think of other action verbs that use \"am\"? For example, do we say \"I am *understand*\" or \"I am *run*\"? \n\nWhat do you think is the correct way to say it when you express agreement? \ud83e\udd14",
+  "model": "claude-haiku-4-5-20251001",
+  "tool_used": "get_writing_feedback",
+  "tool_endpoint": "https://teachmewrite-ai-195673983724.asia-south1.run.app/feedback"
+}

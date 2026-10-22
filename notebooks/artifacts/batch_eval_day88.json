@@ -1,0 +1,505 @@
+{
+  "run_date": "2026-10-21",
+  "model_under_test": "claude-haiku-4-5 (production service)",
+  "judge_model": "claude-haiku-4-5-20251001",
+  "num_cases": 20,
+  "summary": {
+    "accuracy_avg": 4.9,
+    "helpfulness_avg": 4.65,
+    "tone_avg": 4.9,
+    "weak_cases": 0
+  },
+  "detailed_results": [
+    {
+      "case_id": "g01",
+      "student_text": "I go to university yesterday.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The present tense 'go' is incorrect with the past time marker 'yesterday'. Should be 'went' (simple past tense).",
+            "example": "I go to university yesterday"
+          }
+        ],
+        "rewrite_suggestion": "I went to university yesterday.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the tense-time mismatch error and provided a clear, actionable correction with an appropriate rewrite suggestion. The feedback is professional, encouraging, and perfectly suited for a Pakistani ESL learner."
+      }
+    },
+    {
+      "case_id": "g02",
+      "student_text": "She don't like going to school everyday.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The subject 'She' is third-person singular and requires the verb 'doesn't', not 'don't'. Should be 'doesn't like', not 'don't like'.",
+            "example": "She don't like"
+          },
+          {
+            "category": "grammar",
+            "severity": "medium",
+            "explanation": "The word 'everyday' should be 'every day' (two words) when used as an adverbial phrase meaning 'each day'. 'Everyday' (one word) is an adjective meaning 'ordinary'.",
+            "example": "going to school everyday"
+          }
+        ],
+        "rewrite_suggestion": "She doesn't like going to school every day.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified both errors (subject-verb agreement with 'doesn't' and the everyday/every day distinction) with clear, actionable explanations suitable for Pakistani English learners. The feedback is professional, encouraging, and provides a correct rewrite as a learning model."
+      }
+    },
+    {
+      "case_id": "g03",
+      "student_text": "My father have two car.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The verb 'have' does not agree with the singular subject 'father'. It should be 'has', not 'have'.",
+            "example": "My father have"
+          },
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The noun 'car' is countable and must be pluralized after the number 'two'. It should be 'cars', not 'car'.",
+            "example": "two car"
+          }
+        ],
+        "rewrite_suggestion": "My father has two cars.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 4,
+        "reasoning": "The AI correctly identified both subject-verb agreement and noun pluralization errors with clear, accurate explanations suitable for Pakistani ESL learners. The feedback is constructive and includes a correct rewrite suggestion, though it could be slightly more encouraging in tone."
+      }
+    },
+    {
+      "case_id": "g04",
+      "student_text": "I am go to market now.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The verb form is incorrect. With the present continuous tense (indicating an action happening now), you need 'am going', not 'am go'. The auxiliary verb 'am' must be followed by the -ing form of the main verb.",
+            "example": "I am go to market now"
+          }
+        ],
+        "rewrite_suggestion": "I am going to the market now.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the present continuous tense error ('am go' vs 'am going') and provided a clear, grammatically accurate explanation with proper correction. The feedback is appropriately pitched for Pakistani students, includes a helpful rewrite suggestion, and maintains a professional, educational tone throughout."
+      }
+    },
+    {
+      "case_id": "g05",
+      "student_text": "He is more taller than me.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "This is a double comparative error. 'More' and 'taller' are both comparative forms; only one should be used. It should be 'He is taller than me' or 'He is more tall than me' (though 'taller' is the correct form).",
+            "example": "He is more taller than me."
+          }
+        ],
+        "rewrite_suggestion": "He is taller than me.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 4,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the double comparative error and provided accurate explanations with appropriate examples. The feedback is professional and encouraging, though the parenthetical note about 'more tall' could confuse students since that form is rarely used in modern English."
+      }
+    },
+    {
+      "case_id": "g06",
+      "student_text": "My father have two car and he drive them daily.",
+      "ai_feedback": {
+        "overall_score": 35,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The subject 'father' is singular, so the verb should be 'has', not 'have'. This is a subject-verb agreement error.",
+            "example": "My father have"
+          },
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "After the number 'two', the noun must be plural. It should be 'cars', not 'car'. This is a missing plural form error.",
+            "example": "two car"
+          },
+          {
+            "category": "grammar",
+            "severity": "medium",
+            "explanation": "The tense shifts without reason. For consistency and clarity, use the same tense throughout. Since 'have' and the context describe habitual actions, both verbs should agree: 'has' and 'drives'.",
+            "example": "he drive them"
+          }
+        ],
+        "rewrite_suggestion": "My father has two cars and he drives them daily.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified all three errors (subject-verb agreement with 'have/has', missing plural form 'car/cars', and verb tense inconsistency with 'drive/drives') with accurate explanations. The feedback is highly actionable for Pakistani students, providing clear examples and a correct rewrite. The tone is professional, respectful, and appropriately structured without being condescending."
+      }
+    },
+    {
+      "case_id": "g07",
+      "student_text": "I have went to Lahore last week and I seen the fort.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The past participle 'went' cannot be used with 'have'; the correct form is 'have gone', not 'have went'.",
+            "example": "I have went to Lahore"
+          },
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The past tense 'seen' cannot stand alone; it should be 'I saw', not 'I seen'.",
+            "example": "I seen the fort"
+          }
+        ],
+        "rewrite_suggestion": "I went to Lahore last week and I saw the fort.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 4,
+        "reasoning": "The AI correctly identified both grammar errors (incorrect past participle 'went' with 'have' and misuse of 'seen' as simple past). The explanations are clear and actionable for Pakistani students, with proper corrections provided. The tone is professional and direct, though slightly less encouraging than ideal."
+      }
+    },
+    {
+      "case_id": "g08",
+      "student_text": "She is studying in university since three years.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The present perfect continuous tense is required with 'since' and a duration. Should be 'has been studying', not 'is studying'.",
+            "example": "She is studying in university since three years."
+          },
+          {
+            "category": "grammar",
+            "severity": "medium",
+            "explanation": "The preposition 'in' is incorrect before 'university'. Should be 'at university' in British English or 'at a university' in American English.",
+            "example": "studying in university"
+          },
+          {
+            "category": "grammar",
+            "severity": "medium",
+            "explanation": "The time expression 'three years' should be preceded by 'for', not just the number alone. Should be 'for three years' to indicate a duration with 'since'.",
+            "example": "since three years"
+          }
+        ],
+        "rewrite_suggestion": "She has been studying at university for three years.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 4,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified all three errors with precise explanations and appropriate severity levels. The feedback is highly actionable for Pakistani students, offering clear before/after examples and a correct rewrite. The tone is professional, objective, and constructive."
+      }
+    },
+    {
+      "case_id": "g09",
+      "student_text": "The informations are very important for the students.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The noun 'information' is uncountable in English and should never be pluralized. It should be 'The information is' (singular verb), not 'The informations are'.",
+            "example": "The informations are very important"
+          },
+          {
+            "category": "clarity",
+            "severity": "low",
+            "explanation": "The sentence is grammatically correct after fixing the countable noun error, but it is vague and generic. It would benefit from specifying what information and why it matters to students.",
+            "example": "The informations are very important for the students."
+          }
+        ],
+        "rewrite_suggestion": "The information is very important for students. (Even better: 'Accurate study materials are very important for students because they help with learning.')",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 4,
+        "helpfulness_score": 4,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the uncountable noun error (information/informations) and provided accurate guidance with appropriate examples. The feedback is constructive and offers practical alternatives; however, there is a minor logical inconsistency in calling the sentence 'grammatically correct' in the clarity section immediately after identifying a grammar error. The tone is professional, encouraging, and well-suited for Pakistani ESL learners."
+      }
+    },
+    {
+      "case_id": "g10",
+      "student_text": "I am agree with your opinion about this topic.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The phrase \"I am agree\" is incorrect. The verb \"agree\" does not take the auxiliary \"am\"; it should be \"I agree\" (simple present tense).",
+            "example": "I am agree with your opinion"
+          },
+          {
+            "category": "clarity",
+            "severity": "low",
+            "explanation": "The phrase \"with your opinion about this topic\" is vague and could be more specific. At level 3, you should identify which aspect of the opinion you agree with to make your writing clearer.",
+            "example": "with your opinion about this topic"
+          }
+        ],
+        "rewrite_suggestion": "I agree with your opinion about this topic. (If you want to be more specific, you could add: I agree with your opinion that [specific point], because [reason].)",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the critical grammar error (incorrect use of 'am' with 'agree') and provided accurate explanation with proper correction. The feedback is constructive, actionable for Pakistani learners, and includes a practical rewrite suggestion with guidance for improvement."
+      }
+    },
+    {
+      "case_id": "g11",
+      "student_text": "The research which was conducted by the team have shown significant results.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "The subject 'research' is singular, so the verb should be 'has' not 'have'. The relative clause 'which was conducted by the team' is descriptive but does not change the number of the main subject.",
+            "example": "The research which was conducted by the team have shown"
+          },
+          {
+            "category": "structure",
+            "severity": "medium",
+            "explanation": "The sentence uses a relative clause that creates unnecessary complexity for the core idea. A simpler structure would improve clarity and flow.",
+            "example": "The research which was conducted by the team have shown significant results"
+          },
+          {
+            "category": "clarity",
+            "severity": "low",
+            "explanation": "The phrase 'have shown significant results' is somewhat vague. Specifying what results or findings would strengthen the sentence.",
+            "example": "have shown significant results"
+          }
+        ],
+        "rewrite_suggestion": "The team's research has shown significant results. (Or: The research conducted by the team has shown significant results in [specific area].)",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the subject-verb agreement error (singular 'research' requires 'has' not 'have'), provided clear explanations with examples, and offered practical rewrite suggestions appropriate for Pakistani English learners. The feedback is well-structured, professional, and constructive."
+      }
+    },
+    {
+      "case_id": "g12",
+      "student_text": "I would of completed the assignment if I had more time.",
+      "ai_feedback": {
+        "overall_score": 45,
+        "issues": [
+          {
+            "category": "grammar",
+            "severity": "high",
+            "explanation": "Should be 'would have', not 'would of'. The auxiliary verb 'have' is often confused with the preposition 'of' in speech, but the correct form in conditional past tense is 'would have'.",
+            "example": "would of completed"
+          }
+        ],
+        "rewrite_suggestion": "I would have completed the assignment if I had more time.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the common 'would of' vs 'would have' error, provided a clear explanation of why this mistake occurs (phonetic confusion between 'have' and 'of'), and gave an accurate rewrite. The feedback is appropriately pitched for Pakistani students and maintains a professional, non-judgmental tone."
+      }
+    },
+    {
+      "case_id": "g13",
+      "student_text": "In my opinion, I think that this policy is very much necessary for the society.",
+      "ai_feedback": {
+        "overall_score": 75,
+        "issues": [
+          {
+            "category": "clarity",
+            "severity": "low",
+            "explanation": "The phrase combines two redundant expressions that mean the same thing. 'In my opinion' and 'I think' should not be used together; choose one.",
+            "example": "In my opinion, I think that"
+          }
+        ],
+        "rewrite_suggestion": "In my opinion, this policy is very necessary for society. (Or simply: 'I think this policy is necessary for society.')",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the redundancy error ('In my opinion' + 'I think'), provided clear actionable alternatives, and offered appropriate level-based suggestions. The feedback is professional, encouraging, and directly applicable for Pakistani ESL learners."
+      }
+    },
+    {
+      "case_id": "g14",
+      "student_text": "I went to the market yesterday and bought some fruit.",
+      "ai_feedback": {
+        "overall_score": 88,
+        "issues": [],
+        "rewrite_suggestion": "Your grammar is correct! Great job. To improve further, you could add more specific detail\u2014for example: 'I went to the market yesterday and bought fresh apples, oranges, and bananas.' This helps readers visualize exactly what you purchased.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified that the student's text contains no grammar or clarity errors, and provided constructive, actionable feedback on adding specificity and detail. The tone is encouraging and professional, appropriate for building student confidence while offering practical improvement strategies."
+      }
+    },
+    {
+      "case_id": "g15",
+      "student_text": "She has been studying English for three years.",
+      "ai_feedback": {
+        "overall_score": 88,
+        "issues": [],
+        "rewrite_suggestion": "Your grammar is correct! Great job. To improve further, you could try adding more context or detail\u2014for example: 'She has been studying English for three years and has made significant progress in her speaking skills.' This gives readers a clearer picture of her achievement.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 4,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified that the sentence contains no grammar or clarity errors; the present perfect continuous tense is used accurately. The feedback is encouraging and provides a practical suggestion for elaboration, though the rewrite suggestion goes beyond error correction into stylistic enhancement, which is helpful but slightly beyond the scope of basic grammar evaluation."
+      }
+    },
+    {
+      "case_id": "g16",
+      "student_text": "The government should invest more in public education to improve literacy rates.",
+      "ai_feedback": {
+        "overall_score": 90,
+        "issues": [],
+        "rewrite_suggestion": "Your grammar is correct! Great job. To improve further, you could try adding supporting evidence or an example\u2014for instance: 'The government should invest more in public education to improve literacy rates, as countries like Finland have demonstrated significant gains through increased education funding.'",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 4,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified that the student's sentence contains no grammar or clarity errors. The feedback is encouraging, professional, and offers constructive suggestions for enhancement through the addition of evidence and examples, which is practical guidance for Pakistani learners developing academic writing skills."
+      }
+    },
+    {
+      "case_id": "g17",
+      "student_text": "My name is Ahmed. I am a student.",
+      "ai_feedback": {
+        "overall_score": 75,
+        "issues": [],
+        "rewrite_suggestion": "Your sentences are grammatically correct! Great job. To improve further, you could try combining these two sentences into one: 'My name is Ahmed and I am a student.' This makes your writing flow better and shows you can write longer sentences.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 4,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified that both sentences are grammatically correct with no errors, and provided an accurate suggestion for combining sentences to improve flow. The feedback is encouraging, actionable for a Pakistani student, and uses a respectful, positive tone; the only minor limitation is that the rewrite suggestion, while valid, could have included additional techniques for sentence variety."
+      }
+    },
+    {
+      "case_id": "g18",
+      "student_text": "Hello.",
+      "ai_feedback": {
+        "overall_score": 75,
+        "issues": [],
+        "rewrite_suggestion": "Your grammar is correct! Great job. To improve further, you could try adding more detail\u2014for example: \"Hello, my name is [your name]\" or \"Hello, how are you today?\" This helps you practice longer sentences and communicate more fully.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 4,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified that the single-word greeting contains no grammar errors. The feedback is encouraging, provides constructive suggestions for expansion that are appropriate for beginners, and uses a supportive, professional tone that would motivate Pakistani students."
+      }
+    },
+    {
+      "case_id": "g19",
+      "student_text": "I am learning English because it is important for my career and I want to communicate with people from different countries and understand different cultures and improve my job opportunities in the future.",
+      "ai_feedback": {
+        "overall_score": 85,
+        "issues": [
+          {
+            "category": "clarity",
+            "severity": "low",
+            "explanation": "The sentence is very long with multiple clauses connected by 'and', making it difficult to follow. Breaking it into shorter sentences or using varied sentence structures would improve readability.",
+            "example": "I am learning English because it is important for my career and I want to communicate with people from different countries and understand different cultures and improve my job opportunities in the future."
+          }
+        ],
+        "rewrite_suggestion": "Your grammar is correct! Great job. Here's an optional suggestion to improve readability: 'I am learning English because it is important for my career. I want to communicate with people from different countries, understand different cultures, and improve my job opportunities in the future.' This breaks the long sentence into two parts and uses commas to separate related ideas more clearly.",
+        "level_appropriate": true
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 5,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified the run-on sentence issue caused by excessive 'and' conjunctions, provided a clear and practical rewrite suggestion with proper punctuation, and delivered the feedback in an encouraging, professional manner appropriate for Pakistani ESL learners."
+      }
+    },
+    {
+      "case_id": "g20",
+      "student_text": "\u0645\u06cc\u06ba \u0627\u0646\u06af\u0644\u0634 \u0633\u06cc\u06a9\u06be \u0631\u06c1\u0627 \u06c1\u0648\u06ba \u06a9\u06cc\u0648\u0646\u06a9\u06c1 \u06cc\u06c1 \u0645\u06cc\u0631\u06d2 \u06a9\u06cc\u0631\u06cc\u0626\u0631 \u06a9\u06d2 \u0644\u06cc\u06d2 \u0627\u06c1\u0645 \u06c1\u06d2\u06d4",
+      "ai_feedback": {
+        "overall_score": 0,
+        "issues": [
+          {
+            "category": "clarity",
+            "severity": "high",
+            "explanation": "Your submission is written in Urdu script, not English. To receive feedback on your English writing, please write your response in English letters and words. We appreciate your effort to learn English\u2014this is a great step forward!",
+            "example": "[REDACTED - Urdu script detected]"
+          }
+        ],
+        "rewrite_suggestion": "English translation of your text: 'I am learning English because it is important for my career.' Here is a corrected English version: 'I am learning English because it is important for my career.' Well done on your message! Now, please try writing directly in English next time, and we'll give you detailed feedback on your grammar, vocabulary, and style. You're doing great!",
+        "level_appropriate": false
+      },
+      "judge_eval": {
+        "accuracy_score": 5,
+        "helpfulness_score": 4,
+        "tone_score": 5,
+        "reasoning": "The AI correctly identified that the submission was in Urdu script rather than English, which is an accurate observation. The feedback is helpful by providing an English translation and encouraging the student to write in English next time, with an appropriately supportive and professional tone throughout."
+      }
+    }
+  ]
+}

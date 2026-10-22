@@ -1,0 +1,48 @@
+{
+  "test_id": "baseline_001",
+  "student_text": "I am agree with my father that education is more better than money. He give me good advices every day.",
+  "ai_feedback": {
+    "overall_score": 45,
+    "issues": [
+      {
+        "category": "grammar",
+        "severity": "high",
+        "explanation": "Incorrect verb form: 'am agree' is not standard English. The correct form is 'agree' without 'am'.",
+        "example": "I am agree"
+      },
+      {
+        "category": "grammar",
+        "severity": "high",
+        "explanation": "Double comparative construction: 'more better' uses two comparative forms together. Should be either 'better' or 'more good', with 'better' being correct.",
+        "example": "more better"
+      },
+      {
+        "category": "grammar",
+        "severity": "high",
+        "explanation": "Subject-verb disagreement: 'He give' should be 'He gives' (third person singular present tense requires -s ending).",
+        "example": "He give"
+      },
+      {
+        "category": "grammar",
+        "severity": "high",
+        "explanation": "Uncountable noun error: 'advices' is incorrect. The word 'advice' is uncountable and should not be pluralized; it remains 'advice'.",
+        "example": "advices"
+      },
+      {
+        "category": "clarity",
+        "severity": "medium",
+        "explanation": "The phrase 'education is more better than money' presents a false comparison. Education and money are typically not compared as direct alternatives in this way; consider clarifying the intended meaning.",
+        "example": "education is more better than money"
+      }
+    ],
+    "rewrite_suggestion": "I agree with my father that education is better than money. He gives me good advice every day.",
+    "level_appropriate": true
+  },
+  "judge_eval": {
+    "accuracy_score": 5,
+    "helpfulness_score": 5,
+    "tone_score": 5,
+    "reasoning": "The AI correctly identified all four major grammar errors (verb form, double comparative, subject-verb agreement, and uncountable noun) with precise explanations and a valid rewrite suggestion. The feedback is exceptionally clear, well-structured, and appropriately pitched for Pakistani students, with specific rules and examples that aid understanding."
+  },
+  "timestamp": "2026-10-21"
+}

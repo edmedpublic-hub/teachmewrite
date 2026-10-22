@@ -1,0 +1,34 @@
+{
+  "test_date": "2026-10-22",
+  "tests": [
+    {
+      "name": "broken_url",
+      "result": "graceful_failure",
+      "retries_observed": 3,
+      "agent_response": "I'm sorry! The feedback service is temporarily unavailable. Please try again in a minute.\n\nIn the meantime, here are **two quick things** to look for in your sentence:\n\n1. **\"I am agree\"** \u2014 Think about what verb comes after \"I am\"? (Hint: it should be a verb ending in -ing, not just \"agree\")\n\n2. **\"more better\"** \u2014 This is a **double comparison**. When a word already means \"more\" (like \"better\"), you don't need to add \"more\" before it.\n\nOnce the service is back up, I can give you detailed feedback. Good luck! \ud83d\udcda",
+      "errors_seen": [
+        "Unexpected failure: RetryError[<Future at 0x78ed2ef54a50 state=finished raised ConnectionError>]"
+      ]
+    },
+    {
+      "name": "live_url",
+      "result": "normal_operation",
+      "retries_observed": 0,
+      "agent_response": "Great! Let me help you spot the issues:\n\n**Issue 1: \"am agree\"**\n- You wrote: *I **am agree**...*\n- The problem: \"agree\" is a regular action verb. We don't say \"am agree\" \u2014 that's like saying \"I am go\" or \"I am study.\"\n- The fix: Just say **\"I agree\"**\n\n**Issue 2: \"more better\"**\n- You wrote: *education is **more better** than money*\n- The problem: \"better\" is **already** the comparison word. When you add \"more,\" it becomes a double comparison, which is wrong. It's like saying \"more taller\" \u2014 doesn't work!\n- The fix: Use just **\"better\"** (or just **\"more good\"**, but \"better\" is standard)\n\n**Corrected sentence:**\n> *I agree with my father that education is better than money.*\n\nDoes that make sense? Can you spot why each mistake happened? \ud83c\udfaf",
+      "errors_seen": []
+    },
+    {
+      "name": "intermittent_failure",
+      "result": "recovered_via_retry",
+      "attempts_until_success": 3,
+      "agent_response": "Great! Here are the two mistakes in your sentence:\n\n**Mistake 1: \"I am agree\"**\n- You don't need \"am\" with the verb \"agree\"\n- Just say: **\"I agree\"**\n- *Why?* \"Agree\" is an action verb that works alone. \"Am\" is only for describing states like \"I am happy\" or \"I am Pakistani.\"\n\n**Mistake 2: \"more better\"**\n- \"Better\" is already a comparative word (comparing two things)\n- Adding \"more\" makes it redundant\n- Just say: **\"better than\"** (not \"more better than\")\n- *Why?* You wouldn't say \"more taller\" or \"more faster\"\u2014same rule!\n\n**Corrected sentence:**\n*\"I agree with my father that education is better than money.\"*\n\nThat's a solid thought! Does this make sense? \ud83d\ude0a",
+      "errors_seen": []
+    }
+  ],
+  "verification": "All 3 resilience tests passed",
+  "retry_library": "tenacity",
+  "retry_config": {
+    "max_attempts": 3,
+    "backoff": "exponential (1s, 2s, 4s)"
+  }
+}
