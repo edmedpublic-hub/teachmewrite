@@ -130,7 +130,7 @@ and present them as errors. Instead:
 Student text:
 {req.student_text}"""
 
-    response = _client.beta.messages.parse(
+    response = _client.messages.parse(
         model="claude-haiku-4-5",
         max_tokens=1024,
         messages=[{"role": "user", "content": prompt}],
