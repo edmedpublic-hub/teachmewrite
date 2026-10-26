@@ -1,6 +1,6 @@
 fastapi==0.143.3
 uvicorn[standard]==0.54.0
-anthropic
+anthropic<2
 pydantic==2.14.1
 httpx==0.28.1
 prometheus-fastapi-instrumentator==7.1.0
