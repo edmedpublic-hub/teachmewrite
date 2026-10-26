@@ -130,9 +130,13 @@ Student text:
 {req.student_text}"""
 
     # Add the JSON schema to the prompt
+    # Add the JSON schema to the prompt
     schema_prompt = f"""
     
-    Return your response as a JSON object that strictly follows this schema:
+    CRITICAL INSTRUCTION: Return ONLY a raw JSON object. 
+    Do NOT wrap it in markdown code blocks (like ```json).
+    Do NOT include any conversational text before or after the JSON.
+    The JSON must strictly follow this schema:
     {FeedbackResponse.model_json_schema()}
     """
     full_prompt = prompt + schema_prompt
@@ -145,10 +149,19 @@ Student text:
     )
 
     # Extract the text content and parse it manually
+    # Extract the text content and parse it manually
     raw_text = response.content[0].text
-    # Strip any markdown code fences if present
-    raw_text = raw_text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
     
+    # Use regex to find the first '{' and last '}'
+    import re
+    match = re.search(r'\{.*\}', raw_text, re.DOTALL)
+    if not match:
+        raise ValueError(f"No JSON object found in LLM response: {raw_text}")
+    
+    json_str = match.group(0)
+    
+    # Manual parsing into Pydantic
+    result = FeedbackResponse.model_validate_json(json_str)
     # Manual parsing into Pydantic
     result = FeedbackResponse.model_validate_json(raw_text)
     
