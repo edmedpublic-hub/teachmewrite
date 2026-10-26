@@ -1,6 +1,7 @@
 """TeachMeWrite AI feedback service."""
 import os
 import re
+import json
 import traceback
 import secrets
 from fastapi import FastAPI, HTTPException, Depends
@@ -28,7 +29,6 @@ class FeedbackResponse(BaseModel):
     level_appropriate: bool
 
 # --- Client (created once at import) ---
-# We add .strip() to remove any hidden newlines from GCP Secret Manager that cause 401 errors
 _client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"].strip())
 
 def get_feedback(req: FeedbackRequest) -> FeedbackResponse:
@@ -129,15 +129,16 @@ and present them as errors. Instead:
 Student text:
 {req.student_text}"""
 
-    # Add the JSON schema to the prompt
-    # Add the JSON schema to the prompt
+    # Format the schema as valid JSON, not a Python dict string
+    schema_json = json.dumps(FeedbackResponse.model_json_schema(), indent=2)
+    
     schema_prompt = f"""
     
     CRITICAL INSTRUCTION: Return ONLY a raw JSON object. 
     Do NOT wrap it in markdown code blocks (like ```json).
     Do NOT include any conversational text before or after the JSON.
     The JSON must strictly follow this schema:
-    {FeedbackResponse.model_json_schema()}
+    {schema_json}
     """
     full_prompt = prompt + schema_prompt
 
@@ -149,11 +150,9 @@ Student text:
     )
 
     # Extract the text content and parse it manually
-    # Extract the text content and parse it manually
     raw_text = response.content[0].text
     
     # Use regex to find the first '{' and last '}'
-    import re
     match = re.search(r'\{.*\}', raw_text, re.DOTALL)
     if not match:
         raise ValueError(f"No JSON object found in LLM response: {raw_text}")
@@ -162,8 +161,6 @@ Student text:
     
     # Manual parsing into Pydantic
     result = FeedbackResponse.model_validate_json(json_str)
-    # Manual parsing into Pydantic
-    result = FeedbackResponse.model_validate_json(raw_text)
     
     # --- SECURITY FIREWALL ---
     # 1. Toxicity Check (Failsafe: wipe example if toxic words found)
@@ -218,4 +215,4 @@ def feedback(req: FeedbackRequest):
     except Exception as e:
         traceback.print_exc()
         print(f"Unhandled exception: {type(e).__name__}: {e}")
-        raise HTTPException(status_code=500, detail="Internal error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal error")
