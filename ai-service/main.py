@@ -205,4 +205,4 @@ def feedback(req: FeedbackRequest):
     except Exception as e:
         traceback.print_exc()
         print(f"Unhandled exception: {type(e).__name__}: {e}")
-        raise HTTPException(status_code=500, detail="Internal error")
+        raise HTTPException(status_code=500, detail="Internal error: {str(e)}")
