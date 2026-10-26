@@ -130,12 +130,26 @@ and present them as errors. Instead:
 Student text:
 {req.student_text}"""
 
-    response = _client.messages.parse(
-        model="claude-haiku-4-5",
+    # Add the JSON schema to the prompt
+    schema_prompt = f"""
+    
+    Return your response as a JSON object that strictly follows this schema:
+    {FeedbackResponse.model_json_schema()}
+    """
+    full_prompt = prompt + schema_prompt
+
+    # Use messages.create (stable, no beta headers required)
+    response = _client.messages.create(
+        model="claude-haiku-4-5-20251001",
         max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}],
-        output_format=FeedbackResponse,
+        messages=[{"role": "user", "content": full_prompt}],
     )
+
+    # Extract the text content and parse it manually
+    raw_text = response.content[0].text
+    # Strip any markdown code fences if present
+    raw_text = raw_text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+    parsed_output = FeedbackResponse.model_validate_json(raw_text)
     if response.parsed_output is None:
         raise ValueError(f"Model output did not match schema. stop_reason={response.stop_reason}")
     result = response.parsed_output    
@@ -190,6 +204,7 @@ def feedback(req: FeedbackRequest):
     except ValidationError:
         raise HTTPException(status_code=422, detail="Invalid request payload")
     except APIError:
+        print(f"Anthropic API Error: {e}")
         raise HTTPException(status_code=502, detail="Upstream model error")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal error")
