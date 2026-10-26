@@ -56,7 +56,8 @@ jobs:
             --platform managed \
             --allow-unauthenticated \
             --set-secrets ANTHROPIC_API_KEY=anthropic-api-key:latest \
-            --set-env-vars METRICS_USER=grafana,METRICS_PASS=TMw_metrics_2026 \
+            --set-env-vars "METRICS_USER=grafana,METRICS_PASS=TMw_metrics_2026,TMW_API_KEYS=dummy_key_for_ci_pipeline_32_chars_long" \
+            
             --max-instances 1 \
             --memory 512Mi \
             --cpu 1 \
