@@ -55,7 +55,8 @@ jobs:
             --region "$REGION" \
             --platform managed \
             --allow-unauthenticated \
-            --set-secrets ANTHROPIC_API_KEY=anthropic-api-key:latest \            --set-env-vars "METRICS_USER=grafana,METRICS_PASS=TMw_metrics_2026,TMW_API_KEYS=dummy_key_for_ci_pipeline_32_chars_long,TMW_RATE_LIMIT_PER_MIN=200" \
+            --set-secrets ANTHROPIC_API_KEY=anthropic-api-key:latest \
+            --set-env-vars "METRICS_USER=grafana,METRICS_PASS=TMw_metrics_2026,TMW_API_KEYS=dummy_key_for_ci_pipeline_32_chars_long,TMW_RATE_LIMIT_PER_MIN=200" \
             --max-instances 1 \
             --memory 512Mi \
             --cpu 1 \
@@ -99,6 +100,7 @@ jobs:
         run: |
           pip install -r ai-service/requirements-gate.txt
           python ai-service/run_gate.py "$STAGING_URL" --runs 3 --threshold 2 --judge --min-helpfulness 3 --out gate_result.json
+
       - name: Promote staging to 100% traffic (only if gate passed)
         run: |
           gcloud run services update-traffic "$SERVICE" \
