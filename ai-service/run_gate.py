@@ -116,7 +116,9 @@ def main():
         runs = []
         for _ in range(args.runs):
             try:
-                r = httpx.post(f"{args.service_url}/feedback", json=payload, timeout=120.0)
+                # Pass the API key (uses env var, falls back to dummy for CI)
+                api_key = os.environ.get("TMW_API_KEY", "dummy_key_for_ci_pipeline_32_chars_long")
+                r = httpx.post(f"{args.service_url}/feedback", json=payload, headers={"X-API-Key": api_key}, timeout=120.0)
                 runs.append(score_case(case, r.json(), judge_client, args.min_helpfulness)
                             if r.status_code == 200
                             else {"pass": False, "failures": [f"HTTP {r.status_code}"]})
