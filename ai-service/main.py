@@ -28,6 +28,7 @@ from anthropic import Anthropic, APIError
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from jose import JWTError, jwt
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, Field, ValidationError
@@ -162,21 +163,44 @@ _limiter = SlidingWindowLimiter(RATE_LIMIT_PER_MIN)
 _budget = DailyBudget(DAILY_CALL_CEILING, DAILY_TOKEN_CEILING)
 
 
-def require_api_key(request: Request) -> str:
+def authenticate_user(request: Request) -> str:
+    """Checks for a JWT Bearer token first, then falls back to API Key (for CI/CD)."""
+    auth_header = request.headers.get("Authorization", "")
+    
+    # 1. Try JWT (Production Frontend)
+    if auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        try:
+            payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+            user_id = payload.get("user_id") or payload.get("sub")
+            if user_id:
+                return f"user:{user_id}"
+        except JWTError:
+            _log("jwt_auth_failed", request_id=getattr(request.state, "request_id", None))
+            raise HTTPException(status_code=401, detail="Invalid or expired JWT", headers={"WWW-Authenticate": "Bearer"})
+
+    # 2. Fallback: API Key (CI/CD Gate)
     supplied = hashlib.sha256(request.headers.get("x-api-key", "").encode("utf-8")).digest()
     matched = None
     for digest in _API_KEY_DIGESTS:
         if hmac.compare_digest(supplied, digest):
             matched = digest
-    if matched is None:
-        _log("auth_failed", request_id=getattr(request.state, "request_id", None), path=request.url.path)
-        raise HTTPException(status_code=401, detail="Unauthorized", headers={"WWW-Authenticate": "ApiKey"})
-    return matched.hex()[:8]
+    if matched is not None:
+        return f"ci:{matched.hex()[:8]}"
+
+    # 3. Failure
+    _log("auth_failed", request_id=getattr(request.state, "request_id", None), path=request.url.path)
+    raise HTTPException(status_code=401, detail="Unauthorized", headers={"WWW-Authenticate": "Bearer, ApiKey"})
 
 # =============================================================================
 # Model client
 # =============================================================================
 _client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"].strip())
+
+# JWT Configuration (Shared with Django backend)
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dummy_jwt_secret_for_ci_pipeline")
+JWT_ALGORITHM = "HS256"
+
 
 def get_feedback(req: FeedbackRequest, on_usage=None) -> FeedbackResponse:
     prompt = f"""Evaluate this English writing sample from a Pakistani student at level {req.level}/7.
@@ -358,18 +382,18 @@ def metrics(_auth: str = Depends(verify_metrics_auth)):
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 @app.post("/feedback", response_model=FeedbackResponse)
-def feedback(req: FeedbackRequest, request: Request, key_label: str = Depends(require_api_key)):
+def feedback(req: FeedbackRequest, request: Request, identity: str = Depends(authenticate_user)):
     request_id = request.state.request_id
 
-    wait = _limiter.check(key_label)
+    wait = _limiter.check(identity)
     if wait > 0:
-        _log("rate_limited", request_id=request_id, key=key_label)
+        _log("rate_limited", request_id=request_id, key=identity)
         raise HTTPException(status_code=429, detail="Rate limit exceeded",
                             headers={"Retry-After": str(math.ceil(wait))})
 
     reset_in = _budget.reserve_call()
     if reset_in > 0:
-        _log("daily_ceiling_hit", request_id=request_id, key=key_label)
+        _log("daily_ceiling_hit", request_id=request_id, key=identity)
         raise HTTPException(status_code=503, detail="Daily capacity reached",
                             headers={"Retry-After": str(reset_in)})
 
@@ -398,7 +422,7 @@ def feedback(req: FeedbackRequest, request: Request, key_label: str = Depends(re
         print(f"Unhandled exception: {type(e).__name__}: {e}")
         raise HTTPException(status_code=500, detail="Internal error")
     finally:
-        _log("feedback", request_id=request_id, key=key_label, status=status,
+        _log("feedback", request_id=request_id, key=identity, status=status,
              level=req.level, input_chars=len(req.student_text),
              input_tokens=usage["input_tokens"], output_tokens=usage["output_tokens"],
              latency_ms=int((time.monotonic() - started) * 1000))
