@@ -1,0 +1,68 @@
+{
+  "title": "TeachMeWrite Production Metrics",
+  "uid": "teachmewrite-prod",
+  "schemaVersion": 38,
+  "refresh": "1m",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Feedback Traffic (req/sec)",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{handler=\"/feedback\"}[1m]))",
+          "legendFormat": "req/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+          }
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Feedback p95 Latency (seconds)",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{handler=\"/feedback\"}[5m])) by (le))",
+          "legendFormat": "p95",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+          }
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Feedback 5xx Error Rate",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{handler=\"/feedback\", status=~\"5..\"}[5m])) / sum(rate(http_requests_total{handler=\"/feedback\"}[5m]))",
+          "legendFormat": "error rate",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+          }
+        }
+      ]
+    }
+  ]
+}
