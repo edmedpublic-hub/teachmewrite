@@ -24,8 +24,9 @@ from collections import defaultdict, deque
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
+import httpx
 from anthropic import Anthropic, APIError
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, BackgroundTasks, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from jose import JWTError, jwt
@@ -200,6 +201,26 @@ _client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"].strip())
 # JWT Configuration (Shared with Django backend)
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dummy_jwt_secret_for_ci_pipeline")
 JWT_ALGORITHM = "HS256"
+DJANGO_API_URL = os.environ.get("DJANGO_API_URL", "https://httpbin.org/post") # Mock URL for safe testing
+
+def save_progress_task(user_id: str, student_text: str, level: int, feedback_data: dict):
+    """Background task to save student progress to the Django backend."""
+    payload = {
+        "user_id": user_id,
+        "student_text": student_text,
+        "level": level,
+        "feedback": feedback_data
+    }
+    try:
+        # We use httpx to make the API call to Django
+        with httpx.Client() as client:
+            response = client.post(DJANGO_API_URL, json=payload, timeout=10.0)
+            response.raise_for_status()
+        _log("progress_saved", user_id=user_id, status="success")
+    except Exception as e:
+        # Background task failures must NEVER crash the app
+        _log("progress_save_failed", user_id=user_id, error=str(e))
+
 
 
 def get_feedback(req: FeedbackRequest, on_usage=None) -> FeedbackResponse:
@@ -382,7 +403,7 @@ def metrics(_auth: str = Depends(verify_metrics_auth)):
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 @app.post("/feedback", response_model=FeedbackResponse)
-def feedback(req: FeedbackRequest, request: Request, identity: str = Depends(authenticate_user)):
+def feedback(req: FeedbackRequest, request: Request, background_tasks: BackgroundTasks, identity: str = Depends(authenticate_user)):
     request_id = request.state.request_id
 
     wait = _limiter.check(identity)
@@ -407,7 +428,13 @@ def feedback(req: FeedbackRequest, request: Request, identity: str = Depends(aut
     started = time.monotonic()
     status = 200
     try:
-        return get_feedback(req, on_usage=record_usage)
+        result = get_feedback(req, on_usage=record_usage)
+        
+        # Trigger background task to save progress (Extracting actual user_id from identity)
+        user_id = identity.split(":")[1] if ":" in identity else identity
+        background_tasks.add_task(save_progress_task, user_id, req.student_text, req.level, result.model_dump())
+        
+        return result
     except ValidationError as e:
         status = 422
         print(f"Validation Error: {e}")
