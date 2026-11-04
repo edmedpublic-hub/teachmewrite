@@ -17,6 +17,7 @@ const Navbar = () => {
   const navLinks = [
     { path: '/learn', label: 'Learn', icon: '📚' },
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { path: '/studio', label: 'Writing Studio', icon: '📝' },
     { path: '/profile', label: 'Profile', icon: '👤' },
     { path: '/certificates', label: 'Certificates', icon: '🏆' },
   ];
