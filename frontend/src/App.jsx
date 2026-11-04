@@ -15,6 +15,7 @@ import Profile from './components/Profile';
 import Certificates from './components/Certificates';
 import MasteryReport from './components/MasteryReport';
 import TeacherDashboard from './components/TeacherDashboard';
+import WritingStudio from './components/WritingStudio';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -62,6 +63,7 @@ function App() {
       <Router basename="/teach-me-write">
         <div className="min-h-screen bg-gray-50">
           <Routes>
+          <Route path="/studio" element={<PrivateRoute><WritingStudio /></PrivateRoute>} />
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={
