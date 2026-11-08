@@ -34,6 +34,8 @@ from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, Field, ValidationError
 
+from fastapi.middleware.cors import CORSMiddleware
+
 # =============================================================================
 # Configuration
 # =============================================================================
@@ -365,6 +367,27 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     openapi_url=None,
+)
+
+# --- CORS (added Day 105 for E2E: localhost dev + localtunnel) ---
+# allow_credentials=False: JWT travels in Authorization header, not cookies.
+# Override via env on Cloud Run (deploy.yml sets CORS_ALLOWED_ORIGINS).
+_CORS_ORIGINS = [o.strip() for o in os.environ.get(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173"
+).split(",") if o.strip()]
+_CORS_ORIGIN_REGEX = os.environ.get(
+    "CORS_ORIGIN_REGEX",
+    r"https://[a-z0-9-]+\.loca\.lt"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_CORS_ORIGINS,
+    allow_origin_regex=_CORS_ORIGIN_REGEX,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    expose_headers=["X-Request-ID"],
 )
 
 Instrumentator().instrument(app)
