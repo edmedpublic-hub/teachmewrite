@@ -2,6 +2,7 @@
 """Seed data for TeachMeWrite Learning System - MATCHING EXISTING LESSONS"""
 import os
 import django
+from django.db import models
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'writing_mastery_project.settings')
 django.setup()
