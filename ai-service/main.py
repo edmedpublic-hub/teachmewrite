@@ -378,7 +378,7 @@ _CORS_ORIGINS = [o.strip() for o in os.environ.get(
 ).split(",") if o.strip()]
 _CORS_ORIGIN_REGEX = os.environ.get(
     "CORS_ORIGIN_REGEX",
-    r"https://[a-z0-9-]+\.loca\.lt"
+    r"https://[a-z0-9-]+\.(loca\.lt|trycloudflare\.com)"
 )
 app.add_middleware(
     CORSMiddleware,
