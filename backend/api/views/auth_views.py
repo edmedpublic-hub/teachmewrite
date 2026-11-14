@@ -4,7 +4,8 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.models import User
-from lessons.models import Profile, UserProfile, TierProgress
+from django.db import models
+from lessons.models import Profile, UserProfile, TierProgress, Tier
 from ..serializers import UserSerializer, ProfileSerializer, RegisterSerializer, ChangePasswordSerializer
 import logging
 
@@ -40,6 +41,50 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @action(detail=False, methods=['get'], url_path='me')
+    def me(self, request):
+        """Current user with tier state. Returns current_tier + tier_progress.
+
+        current_tier = highest tier the user has unlocked. Basic if none.
+        Tier order is explicit (not alphabetical) because CharField ordering
+        would give PROFESSIONAL > INTERMEDIATE > BASIC > ADVANCED incorrectly.
+        """
+        user = request.user
+        data = UserSerializer(user).data
+
+        # Compute current_tier = highest unlocked
+        tier_order_high_to_low = [
+            Tier.PROFESSIONAL, Tier.ADVANCED, Tier.INTERMEDIATE, Tier.BASIC
+        ]
+        current = Tier.BASIC
+        for t in tier_order_high_to_low:
+            if TierProgress.objects.filter(user=user, tier=t.value, is_unlocked=True).exists():
+                current = t
+                break
+
+        data['current_tier'] = current.value
+        data['current_tier_display'] = dict(Tier.choices).get(current.value, current.value)
+        data['tier_progress'] = [
+            {
+                'tier': tp.tier,
+                'is_unlocked': tp.is_unlocked,
+                'is_completed': tp.is_completed,
+                'mastered_lessons': tp.mastered_lessons,
+                'total_lessons': tp.total_lessons,
+                'mastery_percentage': round(tp.mastery_percentage, 1),
+            }
+            for tp in TierProgress.objects.filter(user=user).order_by(
+                models.Case(
+                    models.When(tier=Tier.BASIC.value, then=0),
+                    models.When(tier=Tier.INTERMEDIATE.value, then=1),
+                    models.When(tier=Tier.ADVANCED.value, then=2),
+                    models.When(tier=Tier.PROFESSIONAL.value, then=3),
+                    default=99,
+                )
+            )
+        ]
+        return Response(data)
+
     @action(detail=False, methods=['get'])
     def dashboard(self, request):
         """Get user-specific dashboard based on role"""
