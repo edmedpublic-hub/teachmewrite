@@ -3,7 +3,7 @@ name: build-test-deploy
 on:
   push:
     branches: [main]
-    paths: ['ai-service/**']
+    paths: ['ai-service/**', '.github/workflows/**']
   workflow_dispatch:
 
 permissions:
