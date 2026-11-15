@@ -505,6 +505,26 @@ class TierProgress(models.Model):
         return self
     
     @classmethod
+    def current_tier_for(cls, user):
+        """Return highest tier with is_unlocked=True for this user.
+
+        Explicit order (highest to lowest). See Day 106 debugging entry 5:
+        alphabetical order puts ADVANCED before BASIC, which is wrong.
+
+        Returns a Tier enum value. Caller may use .value for CharField storage.
+        """
+        tier_order_high_to_low = [
+            Tier.PROFESSIONAL,
+            Tier.ADVANCED,
+            Tier.INTERMEDIATE,
+            Tier.BASIC,
+        ]
+        for t in tier_order_high_to_low:
+            if cls.objects.filter(user=user, tier=t.value, is_unlocked=True).exists():
+                return t
+        return Tier.BASIC
+
+    @classmethod
     def initialize_user_tiers(cls, user):
         """Initialize tier progress for a new user"""
         tiers_created = []
@@ -864,3 +884,50 @@ class TestSession(models.Model):
     
     def __str__(self):
         return f"Test {self.id} - Passed: {self.passed}"
+
+# ============================================
+# WRITING STUDIO FEEDBACK (Day 107, Pillar 3)
+# ============================================
+
+class WritingFeedback(models.Model):
+    """Persisted AI feedback from /studio submissions.
+
+    Privacy: student_text is the student's own writing. Never log it, never
+    send it to third parties. Stored in the student's own DB row is fine.
+    The Day 105 httpbin incident was sending this to https://httpbin.org/post.
+
+    Idempotency: session_id is a UUID. FastAPI's request_id (uuid4.hex)
+    is used as session_id. Retries do not create duplicate rows.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='writing_feedback')
+
+    # Idempotency key (FastAPI request_id)
+    session_id = models.UUIDField(unique=True, help_text="FastAPI request_id; unique per submission")
+
+    # Input
+    student_text = models.TextField()
+    level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(7)])
+
+    # Tier at submission -- the futuristic-lens artifact. If the user later
+    # graduates to a higher tier, this row stays tagged with the tier the
+    # feedback was given at. Teachers need historical tier for progression.
+    tier_at_submission = models.CharField(max_length=20, choices=Tier.choices)
+
+    # Output (from FeedbackResponse)
+    overall_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    issues = models.JSONField(default=list, help_text="List of {category, severity, explanation, example}")
+    rewrite_suggestion = models.TextField()
+    level_appropriate = models.BooleanField()
+
+    # Meta
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['user', 'tier_at_submission']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.overall_score}/100 ({self.tier_at_submission})"

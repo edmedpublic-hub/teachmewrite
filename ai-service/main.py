@@ -205,23 +205,41 @@ JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dummy_jwt_secret_for_ci_pipel
 JWT_ALGORITHM = "HS256"
 DJANGO_API_URL = os.environ.get("DJANGO_API_URL", "https://httpbin.org/post") # Mock URL for safe testing
 
-def save_progress_task(user_id: str, student_text: str, level: int, feedback_data: dict):
-    """Background task to save student progress to the Django backend."""
+def save_progress_task(user_id: str, student_text: str, level: int,
+                        feedback_data: dict, session_id: str):
+    """Background task: POST /feedback result to Django callback.
+
+    Auth: X-Internal-Key (service-to-service). Fail-closed if env var unset.
+    Idempotency: session_id (FastAPI request_id) is the dedup key on Django side.
+    Privacy: student_text is included in the payload; Django stores it in the
+    student's own row. It is NEVER logged or sent to third parties.
+    """
+    internal_key = os.environ.get("INTERNAL_API_KEY", "").strip()
+    if not internal_key:
+        _log("progress_save_failed", user_id=user_id, session_id=session_id,
+             error="INTERNAL_API_KEY not set -- refusing to POST")
+        return
+
     payload = {
         "user_id": user_id,
+        "session_id": session_id,
         "student_text": student_text,
         "level": level,
-        "feedback": feedback_data
+        "feedback": feedback_data,
+    }
+    headers = {
+        "X-Internal-Key": internal_key,
+        "Content-Type": "application/json",
     }
     try:
-        # We use httpx to make the API call to Django
         with httpx.Client() as client:
-            response = client.post(DJANGO_API_URL, json=payload, timeout=10.0)
+            response = client.post(DJANGO_API_URL, json=payload, headers=headers, timeout=10.0)
             response.raise_for_status()
-        _log("progress_saved", user_id=user_id, status="success")
+        _log("progress_saved", user_id=user_id, session_id=session_id,
+             status="success", http_status=response.status_code)
     except Exception as e:
         # Background task failures must NEVER crash the app
-        _log("progress_save_failed", user_id=user_id, error=str(e))
+        _log("progress_save_failed", user_id=user_id, session_id=session_id, error=str(e))
 
 
 
@@ -455,7 +473,7 @@ def feedback(req: FeedbackRequest, request: Request, background_tasks: Backgroun
         
         # Trigger background task to save progress (Extracting actual user_id from identity)
         user_id = identity.split(":")[1] if ":" in identity else identity
-        background_tasks.add_task(save_progress_task, user_id, req.student_text, req.level, result.model_dump())
+        background_tasks.add_task(save_progress_task, user_id, req.student_text, req.level, result.model_dump(), request_id)
         
         return result
     except ValidationError as e:

@@ -3,6 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import views
+from .views.writing_views import feedback_callback
 
 router = DefaultRouter()
 
@@ -30,6 +31,7 @@ router.register(r'questions', views.QuestionBankViewSet, basename='question')
 router.register(r'student-progress', views.StudentLessonProgressViewSet, basename='student-progress')
 
 urlpatterns = [
+    path('writing/feedback-callback/', feedback_callback, name='feedback_callback'),
     # API Root
     path('', include(router.urls)),
     
