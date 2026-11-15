@@ -52,15 +52,8 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         data = UserSerializer(user).data
 
-        # Compute current_tier = highest unlocked
-        tier_order_high_to_low = [
-            Tier.PROFESSIONAL, Tier.ADVANCED, Tier.INTERMEDIATE, Tier.BASIC
-        ]
-        current = Tier.BASIC
-        for t in tier_order_high_to_low:
-            if TierProgress.objects.filter(user=user, tier=t.value, is_unlocked=True).exists():
-                current = t
-                break
+        # Centralized in TierProgress (Day 107 -- closes Day 106 finding 5)
+        current = TierProgress.current_tier_for(user)
 
         data['current_tier'] = current.value
         data['current_tier_display'] = dict(Tier.choices).get(current.value, current.value)
