@@ -1,198 +1,169 @@
 # TeachMeWrite
 
-**A mastery-based English writing tutor for Pakistani students — from simple sentences to CSS-level professional writing.**
+A Mastery-Based Learning Management System (LMS) for Pakistani students --
+Matric through CSS/Competitive exams. Three-pillar architecture: Theory,
+Practice, AI Feedback. Four tiers (Basic / Intermediate / Advanced /
+Professional). Multi-tenant (Students / Teachers / Parents / Institute Admins).
 
-[![Django](https://img.shields.io/badge/Django-5.2-092E20?logo=django)](https://www.djangoproject.com/)
-[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev/)
-[![DRF](https://img.shields.io/badge/DRF-3.18-A30000?logo=django)](https://www.django-rest-framework.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
----
-
-## 🎯 The Problem
-
-English writing is the single biggest barrier for Pakistani students competing for:
-
-- **CSS/PMS** — Pakistan's highest civil service exams
-- **IELTS/TOEFL** — international study and work
-- **Academic writing** — university-level essays and theses
-- **Professional communication** — business English
-
-Existing tools (Grammarly, ChatGPT) provide **corrections** but no **structured curriculum**. Students can't tell if they've mastered a skill before moving on — so they plateau.
-
-Coaching centers cost **Rs 100,000+ per year** and don't scale. There is no affordable, structured, digital alternative for writing mastery in Pakistan.
+Built by an educator with 25+ years of English teaching experience, as a
+150-day engineering capstone: build a competitive AI product, document the
+journey daily, prepare for an AI Engineering role.
 
 ---
 
-## 💡 The Solution
+## Status (as of Day 108, 2026-11-15)
 
-TeachMeWrite is a **mastery-based learning platform** with a progressive curriculum. Students cannot advance until they demonstrate competency at each level.
+**Phase 2 (Frontend & UI) -- Day 4 of 50.**
 
-| Level | Skill | Mastery Gate |
-|-------|-------|--------------|
-| 1 | Simple sentences | Grammar + SVO structure |
-| 2 | Compound sentences | Conjunctions + clause boundaries |
-| 3 | Complex sentences | Subordination + coherence |
-| 4 | Paragraphs | Topic sentences + unity |
-| 5 | Essays | Argumentation + evidence |
-| 6 | Stories | Narrative arc + voice |
-| 7 | Professional (CSS-level) | Examiner-standard rubrics |
+- Pillar 1 (Auth): Django JWT, working.
+- Pillar 2 (AI Feedback): FastAPI on Cloud Run, working end-to-end via /studio.
+- Pillar 3 (Persistence): locally proven Day 107 (WritingFeedback rows in DB
+  from real /feedback calls). Deployment pending -- Day 108 failed at Cloud Run
+  deploy because the `internal-api-key` secret was never created in Secret
+  Manager. Fix is 3 Cloud Shell commands, planned for Day 109 opening.
+- Tier linkage: closed Day 106. `TierProgress` exposed via `/api/v1/users/me/`;
+  Navbar shows actual unlocked tier per user.
 
-Each level has:
-- **Teaching content** — concepts explained with examples
-- **Practice mode** — adaptive exercises targeting weak concepts
-- **Mastery test** — unlocks the next level only on passing
-- **Progress tracking** — persistent, per-student
+Day-by-day chapters in `book/day_NNN.md`. The latest chapter is the most
+current picture of state.
 
 ---
 
-## 🏗️ Architecture
-┌─────────────────────────────────────────┐
-│ Frontend (React + Vite) │
-│ • components / hooks / contexts │
-│ • services/ for centralized API calls │
-│ • JWT auth via localStorage │
-└──────────────────┬──────────────────────┘
-│ REST API
-▼
-┌─────────────────────────────────────────┐
-│ Backend (Django + DRF) │
-│ • JWT authentication │
-│ • Mastery engine (progression gates) │
-│ • Progress tracking │
-│ • Lesson content delivery │
-│ • PDF report generation (ReportLab) │
-└─────────────────────────────────────────┘
+## Repository layout
+teachmewrite/
+backend/ Django + DRF (auth, curriculum, progress)
+frontend/ React (Vite) + Tailwind CSS
+ai-service/ FastAPI (Cloud Run, calls Claude Haiku)
+.github/workflows/ CI/CD (build, gate, deploy)
+book/ Daily chapters, day_100.md .. day_108.md
+notebooks/ Older Colab notebooks (Days 85-95)
+ARCHITECTURE.md System map (current as of Day 108)
+TRANSITION_PROMPT.md Bootstrap doc for a fresh chat session
+README.md This file
+
+text
+
+Three deployment targets:
+
+- **Django backend**: runs on Colab :8000 during development. Not yet on Cloud Run.
+- **React frontend**: built with Vite, served via `vite preview` + cloudflared tunnel during dev.
+- **FastAPI ai-service**: deployed to Cloud Run `teachmewrite-ai` in `asia-south1`.
 
 ---
 
-## 🛠️ Tech Stack
+## Quick start (fresh Colab session)
 
-**Backend:**
-- Django 5.2 + Django REST Framework 3.18
-- JWT authentication (djangorestframework-simplejwt)
-- SQLite (dev) / PostgreSQL-ready (prod)
-- ReportLab for PDF reports
-- Pandas for progress analytics
+The 11-cell resume pattern. Each cell is one concern.
 
-**Frontend:**
-- React 18 + Vite
-- React Router
-- Context API for state management
-- Axios for HTTP + JWT interceptors
+1. **Cell 1**: env sanity (Python 3.13, Node 22, GITHUB_TOKEN, ANTHROPIC_API_KEY)
+2. **Cell 2**: Drive mount with stale-state cleanup
+3. **Cell 3**: clone repo, verify Day 107 commits in ancestry
+4. **Cell 4**: pip install backend + ai-service
+5. **Cell 5**: Django up on :8000 (`--noreload`)
+6. **Cell 6**: migrate
+7. **Cell 7a**: seed learning data
+8. **Cell 7b**: create 4 demo users
+9. **Cell 7c**: apply tier policy
+10. **Cell 8**: npm install frontend
+11. **Cell 9**: npm build
+12. **Cell 10**: vite preview :5173
+13. **Cell 11**: cloudflared tunnel (DNS backoff up to 53s -- Day 107 lesson)
+14. **Cell 12**: verify live Cloud Run allows this trycloudflare host
 
-**Deployment Ready:**
-- Gunicorn WSGI server
-- WhiteNoise for static files
-- dj-database-url for production database config
+All cells are idempotent. Re-running a cell is safe. A failed cell names the
+specific step that broke.
 
 ---
 
-## 🚀 Local Setup
+## Deploying ai-service changes
 
-### Prerequisites
-- Python 3.11+
-- Node.js 18+
-- Git
+Any commit under `ai-service/**` or `.github/workflows/**` triggers the
+deploy pipeline:
 
-### Backend
+1. Build Docker image, push to Artifact Registry
+2. Deploy to Cloud Run staging tag (`--no-traffic`)
+3. Wait for staging health (up to 150s)
+4. Golden-set gate (3 runs, 2-of-3 rule, LLM judge, min-helpfulness 3)
+5. Promote to 100% traffic (only if gate passed)
 
-```bash
-git clone https://github.com/edmedpublic-hub/teachmewrite.git
-cd teachmewrite/backend
+Secrets: `ANTHROPIC_API_KEY` and `INTERNAL_API_KEY` are read via
+`--set-secrets` from Secret Manager. Each secret needs its own
+`roles/secretmanager.secretAccessor` binding on the Cloud Run SA
+(`195673983724-compute@developer.gserviceaccount.com`). New secret =>
+new binding. This is not automatic (Day 108 finding).
 
-# Create and activate virtual environment
-python -m venv venv
-# Windows:
-venv\Scripts\activate
-# Mac/Linux:
-# source venv/bin/activate
+Env vars: `deploy.yml` line 59 holds non-secret configuration.
+Notable values today:
+  - `JWT_SECRET_KEY=django-insecure-dev-only-change-in-production` -- MUST match Django's SECRET_KEY for JWT decode to work. Rotates to Secret Manager when Django deploys to Cloud Run (Phase 3).
+  - `DJANGO_API_URL=http://127.0.0.1:1/disabled` -- background task fail-closed. Points to Django tunnel URL once stable (Day 109+).
 
-# Install dependencies
-pip install -r requirements.txt
+---
 
-# Configure environment
-copy .env.example .env
-# Edit .env with your values
+## Deploying Django or Frontend changes
 
-# Run migrations
-python manage.py migrate
+Neither is deployed yet. Both run locally via Colab. The pipeline paths
+filter is `['ai-service/**', '.github/workflows/**']` -- backend and frontend
+changes go to GitHub but do not deploy. Migrating Django to Cloud Run is
+Phase 3 work (Days 108-110 in the roadmap).
 
-# Seed initial curriculum
-python seed_learning_data.py
+---
 
-# Start server
-python manage.py runserver
+## Documents and their roles
 
-Backend runs at http://localhost:8000
+| File | Purpose |
+|---|---|
+| `README.md` | This file. Front door. What the project is, how to resume. |
+| `ARCHITECTURE.md` | Full system map: every module, every endpoint, every model. |
+| `TRANSITION_PROMPT.md` | Bootstrap doc for opening a fresh chat session. |
+| `book/day_NNN.md` | Daily engineering journal. Latest = most current state. |
+| `backend/API_ENDPOINTS.md` | Backend endpoint reference (if maintained). |
+| `ai-service/docs/runbook.md` | Incident response for the AI service. |
+| `ai-service/docs/evaluation.md` | Day 90 golden-set evaluation report. |
 
-Frontend
-cd teachmewrite/frontend
-npm install
-npm run dev
+**When in doubt about state, read the latest `book/day_NNN.md`.**
+The daily chapter is the source of truth for what is working, what is
+pending, and why.
 
-Frontend runs at http://localhost:5173
+---
 
-TeachMeWrite/
-├── backend/                      # Django backend
-│   ├── api/                      # REST API app
-│   │   ├── migrations/
-│   │   └── views/                # ViewSets, split by domain
-│   ├── lessons/                  # Curriculum + mastery engine
-│   │   ├── migrations/
-│   │   └── management/
-│   │       └── commands/         # Custom Django commands
-│   ├── writing_mastery_project/  # Project settings
-│   ├── requirements.txt
-│   ├── .env.example
-│   └── manage.py
-├── frontend/                     # React frontend
-│   └── src/
-│       ├── components/           # Reusable UI
-│       ├── contexts/             # Global state (auth, etc.)
-│       ├── hooks/                # Custom hooks
-│       ├── services/             # API client
-│       └── utils/                # Helpers
-├── data/                         # Curriculum content (JSON)
-├── .gitignore
-├── LICENSE
-└── README.md
+## Known issues (open as of Day 108)
 
-📖 API Documentation
-See backend/API_ENDPOINTS.md for the current API surface.
+- **Secret `internal-api-key` not yet created in Secret Manager.** 3 Cloud Shell commands fix it (see Day 108 chapter, section 3).
+- **`DJANGO_API_URL` on Cloud Run points to loopback** (`127.0.0.1:1/disabled`). Persistence is fail-closed in production. Day 109 work.
+- **"My Essays" UI does not exist.** Persistence is proven (Day 107) but invisible to the user. Day 109+ work.
+- **`TierProgress.update_progress()` does not auto-unlock next tier** when a tier is completed. Day 106 finding, still open.
+- **`fastapi.log` uses write mode `"w"`** in Cell 7, losing prior session's log. Change to append mode in Day 109.
+- **Test-harness discipline:** see Day 107 entries 1-5 and Day 108 entries 5-6. Five rules captured in Day 107 section 5.2. Apply to every new cell.
 
-🗺️ Roadmap
-Completed:
+---
 
-☑ 7-level curriculum structure
-☑ Mastery gate engine
-☑ User authentication + registration
-☑ Progress tracking with weak-concept identification
-☑ Practice and mastery-test modes
-☑ PDF report generation
-In Progress:
+## Working conventions
 
-□ AI-powered feedback for Levels 4-7 (paragraphs → essays → CSS)
-□ Deployment to Railway
-Future:
+These are load-bearing. Violating them produces the failure classes we
+have spent Days 105-108 debugging.
 
-□ Multi-instructor support
-□ Peer review integration
-□ Mobile app
-🤝 Contributing
-This is currently a solo project. If you're interested in collaboration, reach out via the contact below.
+1. **One concern per cell.** Even when the next three steps are visible. Especially then.
+2. **First line of every cell is `# === CELL <id>`.** Enables copy-paste discipline.
+3. **`ast.parse` every code block before delivery.** Catch syntax errors before they run.
+4. **`assert` before `DONE`.** Never print DONE after a conditional that could fail. Three failures in one week from this pattern.
+5. **Derive expected values from `git status` / ORM / API.** Never from memory. Day 107 entry 4.
+6. **`.startswith()` for SHA comparisons.** Never slice. Day 107 entry 5.
+7. **ORM for DB verification.** Raw `sqlite3` bypasses type conversion (UUID `.hex`). Day 107 entry 1.
+8. **No secret values in chat.** Never paste back. Rotate if exposed. Day 108 entry 2.
+9. **Diagnose before edit.** Fetch the actual error from logs. Do not guess. Day 108 entry 4.
+10. **Book chapter at day's end.** Five sections: Milestone, Architecture (Why), Implementation (How), Debugging Diary, Key Takeaways. No exceptions.
+11. **Update README.md, ARCHITECTURE.md, TRANSITION_PROMPT.md at end of day** (or at significant milestones). These files are the memory across sessions -- assistant context does not persist.
 
-📄 License
-This project is licensed under the MIT License — see the LICENSE file for details.
+---
 
-👤 Author
-Muhammad Afzal
+## License
 
-GitHub: @edmedpublic-hub
+Private project. Not yet open-sourced.
 
-Project: Building AI-powered learning tools for Pakistani students
+---
 
-Live produ
+## Links
 
-🙏 Acknowledgments
-Built to solve a real problem — English writing mastery is a barrier for millions of Pakistani students. This project is a step toward making high-quality writing education accessible, measurable, and affordable.
+- GitHub: https://github.com/edmedpublic-hub/teachmewrite
+- Cloud Run (ai-service): https://teachmewrite-ai-195673983724.asia-south1.run.app
+- GCP project: `teachmewrite-prod` (region `asia-south1`)
