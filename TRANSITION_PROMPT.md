@@ -1,6 +1,6 @@
 # TeachMeWrite -- Session Transition Prompt
 
-**Last updated:** Day 108 close (2026-11-15)
+**Last updated:** Day 109 close (2026-11-16)
 **Read this first.** Then open `ARCHITECTURE.md` for depth and the latest
 `book/day_NNN.md` for narrative state. `README.md` is the front door.
 
@@ -25,43 +25,53 @@ Three services:
 
 ---
 
-## Current state (Day 108 close)
+## Current state (Day 109 close)
 
 - **Pillar 1 (Auth):** WORKING. Django JWT; Navbar shows actual unlocked tier via `/me/`.
 - **Pillar 2 (AI Feedback):** WORKING. `/studio` -> Cloud Run -> Claude -> render.
-- **Pillar 3 (Persistence):** LOCAL-PROVEN Day 107. NOT WORKING IN PRODUCTION.
-  - Django callback tested 5/5 Day 107, rows confirmed in local DB
-  - Cloud Run deploy `0c5305b` FAILED at step 07 (Deploy to Cloud Run)
-  - Reason: secret `internal-api-key` does not exist in Secret Manager
-  - Fix: 3 Cloud Shell commands (Day 109 opening task, see below)
-- **Live Cloud Run:** `9cbfd0e` (Day 107 image), fail-closed callback
-- **GitHub main:** HEAD is `0c5305b` (Day 108's two commits on top of `9cbfd0e`)
-- **Book chapters:** `book/day_100.md` .. `book/day_108.md` (latest)
+- **Pillar 3 (Persistence):** DEPLOYED Day 109. Cloud Run serving `0c5305b`.
+  - Local E2E proven Day 107 (5/5 callback tests, rows in DB)
+  - Secret Manager migration completed Day 109 (3 Cloud Shell commands)
+  - Deploy run 43727450414 attempt 2 succeeded; promoted to 100% traffic
+  - End-to-end persistence in production still pending Day 110
+    (`DJANGO_API_URL` points at loopback)
+- **"My Essays" UI:** SHIPPED Day 109. `/essays` route, Navbar link,
+  paginated list with per-card expand/collapse. Browser E2E verified.
+- **Live Cloud Run:** `0c5305b` (Day 108's fixes, promoted Day 109)
+- **GitHub main:** HEAD = Day 109 close commit (run `git log --oneline -1`)
+- **Book chapters:** `book/day_100.md` .. `book/day_109.md` (latest)
 
 ---
 
-## Day 109 opening task (10 minutes)
+## Day 110 opening task (30 minutes)
 
-Three Cloud Shell commands, then rerun deploy. Full detail in
-`book/day_108.md` section 3 and `ARCHITECTURE.md` section 3.1.
+**Primary: close end-to-end persistence in production.**
 
-1. Open Cloud Shell: https://console.cloud.google.com/cloudshell?project=teachmewrite-prod
-2. Run:
-read -s -p "Paste key: " KEY; echo
-printf '%s' "$KEY" | gcloud secrets create internal-api-key --replication-policy=automatic --data-file=- --project=teachmewrite-prod
-gcloud secrets add-iam-policy-binding internal-api-key --member="serviceAccount:195673983724-compute@developer.gserviceaccount.com" --role="roles/secretmanager.secretAccessor" --project=teachmewrite-prod
-unset KEY
+Point `DJANGO_API_URL` at a reachable Django URL so new essays from
+`/studio` persist and appear in "My Essays." Today (Day 109) the browser
+endpoint works against Cloud Run, but the background task still fails on
+loopback (`127.0.0.1:1/disabled`). New essays return feedback but do not
+persist.
 
-text
-3. The key value is at `backend/.env` line `INTERNAL_API_KEY=...` on Colab
-(fingerprint `2c4be7f1`). Also backed up to Drive at
-`/content/drive/MyDrive/teachmewrite-ai/.secrets/internal_api_key`.
-4. Back in Colab: rerun the failed deploy via GitHub API
-(`rerun-failed-jobs` on run `43727450414`) OR the "Re-run failed jobs"
-button in the GitHub UI.
-5. After promote: verify Cloud Run's callback accepts authenticated POSTs.
+Two options, decision for Day 110:
 
-Then begin "My Essays" UI (Day 107/108 deferred deliverable).
+- **Option A (fastest):** second cloudflared tunnel for Django :8000,
+  capture the URL, edit `deploy.yml` `DJANGO_API_URL` env var, push,
+  wait for deploy (~6 min). URL rotates each session; requires a
+  redeploy every session. Acceptable to prove the loop once.
+- **Option B (sustainable):** named cloudflared tunnel via Cloudflare
+  account, stable subdomain. One-time setup (~20 min). No per-session
+  redeploy.
+
+Recommendation: A first to prove persistence works end-to-end, then B
+if per-session redeploys become a nuisance. Both are Day 110 work.
+
+**Then (same day or next):**
+
+1. `TierProgress.update_progress()` auto-unlock on tier completion
+   (Day 106 finding 1; 15 lines + a test)
+2. `fastapi.log` append mode (Day 107 defect; one-line fix)
+3. Begin Phase 2 UI polish (Days 112-114 scope)
 
 ---
 

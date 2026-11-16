@@ -1,6 +1,6 @@
 # TeachMeWrite -- System Architecture Map
 
-**Last updated:** Day 108 (2026-11-15)
+**Last updated:** Day 109 (2026-11-16)
 **Scope:** Current state of the running system. What exists, how it connects,
 what is wired vs. built-not-wired.
 
@@ -72,11 +72,11 @@ issuance. Source of truth for anything that is not AI-generated.
 
 **Role:** All user-facing UI. SPA under `/teach-me-write/`.
 
-**Components** (`frontend/src/components/`, 19 total):
+**Components** (`frontend/src/components/`, 20 total):
 
 - **Auth:** `Login`, `Register`
 - **Learning:** `LandingPage`, `Dashboard`, `UnitBrowser`, `LessonList`, `LessonDetail`, `LessonTeachingView`, `PracticeView`, `TestView`, `WritingPad`
-- **AI:** `WritingStudio` (the /studio page, Day 105)
+- **AI:** `WritingStudio` (the /studio page, Day 105), `MyEssays` (the /essays page, Day 109)
 - **Progress:** `MasteryReport`, `ProgressCircle`, `Certificates`, `CertificateVerify`
 - **Account:** `Profile`, `TeacherDashboard`
 - **Shared:** `Navbar`
@@ -88,6 +88,7 @@ issuance. Source of truth for anything that is not AI-generated.
 | `/` | LandingPage | No |
 | `/login`, `/register` | Login, Register | No (redirect if logged in) |
 | `/dashboard` | Dashboard | Yes |
+| `/essays` | MyEssays | Yes (Day 109) |
 | `/learn` | UnitBrowser | Yes |
 | `/learn/lesson/:id` | LessonTeachingView | Yes |
 | `/practice/:id` | PracticeView | Yes |
@@ -344,11 +345,16 @@ connected, not "mostly done."
 
 ### 3.3 "My Essays" UI
 
-- **Blocker:** does not exist. `WritingFeedback` rows exist in DB but
-  are not visible to the user.
-- **Fix (Day 109):** Backend `GET /api/v1/writing/essays/` (paginated)
-  + frontend `/essays` route + Navbar link. Deferred Day 107 and Day
-  108; **must ship Day 109 or 110**.
+- **Status:** SHIPPED Day 109 (commit pending Cell 24).
+- **Backend:** `GET /api/v1/writing/essays/` (paginated, page_size capped
+  at 100). Server-side tenant isolation via `filter(user=request.user)`.
+  5 sub-tests PASS (owner sees rows, other user sees zero, anon 401,
+  pagination works, page_size cap).
+- **Frontend:** `/essays` route (`MyEssays.jsx`, 204 lines), Navbar link.
+  Bundle-hash-as-proof: `Sq88cd-i` -> `B8X35t0d` (component) ->
+  `Cwqx2DdT` (Navbar).
+- **Browser E2E:** `student_css` sees 3 cards (91/82/75, newest first),
+  expands one to show issues + rewrite.
 
 ### 3.4 Tier auto-unlock on completion
 

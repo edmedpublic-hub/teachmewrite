@@ -11,18 +11,21 @@ journey daily, prepare for an AI Engineering role.
 
 ---
 
-## Status (as of Day 108, 2026-11-15)
+## Status (as of Day 109, 2026-11-16)
 
-**Phase 2 (Frontend & UI) -- Day 4 of 50.**
+**Phase 2 (Frontend & UI) -- Day 5 of 50.**
 
-- Pillar 1 (Auth): Django JWT, working.
+- Pillar 1 (Auth): Django JWT, working. Navbar shows actual unlocked tier via `/me/`.
 - Pillar 2 (AI Feedback): FastAPI on Cloud Run, working end-to-end via /studio.
-- Pillar 3 (Persistence): locally proven Day 107 (WritingFeedback rows in DB
-  from real /feedback calls). Deployment pending -- Day 108 failed at Cloud Run
-  deploy because the `internal-api-key` secret was never created in Secret
-  Manager. Fix is 3 Cloud Shell commands, planned for Day 109 opening.
-- Tier linkage: closed Day 106. `TierProgress` exposed via `/api/v1/users/me/`;
-  Navbar shows actual unlocked tier per user.
+- Pillar 3 (Persistence): DEPLOYED Day 109 (Cloud Run serving `0c5305b`).
+  - Local E2E proven Day 107 (5/5 callback tests)
+  - Secret Manager migration completed Day 109 (3 Cloud Shell commands)
+  - Deploy promoted to 100% traffic Day 109 (attempt 2)
+  - End-to-end persistence in production still pending Day 110 (`DJANGO_API_URL`)
+- Tier linkage: closed Day 106. `/me/` exposes `current_tier` + `tier_progress`.
+- "My Essays" UI: SHIPPED Day 109. `/essays` route, Navbar link, paginated
+  list with per-card expand/collapse. The user-visible deliverable twice
+  deferred is live.
 
 Day-by-day chapters in `book/day_NNN.md`. The latest chapter is the most
 current picture of state.
@@ -126,14 +129,13 @@ pending, and why.
 
 ---
 
-## Known issues (open as of Day 108)
+## Known issues (open as of Day 109)
 
-- **Secret `internal-api-key` not yet created in Secret Manager.** 3 Cloud Shell commands fix it (see Day 108 chapter, section 3).
-- **`DJANGO_API_URL` on Cloud Run points to loopback** (`127.0.0.1:1/disabled`). Persistence is fail-closed in production. Day 109 work.
-- **"My Essays" UI does not exist.** Persistence is proven (Day 107) but invisible to the user. Day 109+ work.
-- **`TierProgress.update_progress()` does not auto-unlock next tier** when a tier is completed. Day 106 finding, still open.
-- **`fastapi.log` uses write mode `"w"`** in Cell 7, losing prior session's log. Change to append mode in Day 109.
-- **Test-harness discipline:** see Day 107 entries 1-5 and Day 108 entries 5-6. Five rules captured in Day 107 section 5.2. Apply to every new cell.
+- **`DJANGO_API_URL` on Cloud Run points to loopback** (`127.0.0.1:1/disabled`). New essays submitted via /studio in production return feedback to the browser but the background task does not persist. Day 110 work: point at a stable Django tunnel URL.
+- **`TierProgress.update_progress()` does not auto-unlock next tier** when a tier is completed. Day 106 finding, still open. Day 110 fix (15 lines + test).
+- **`fastapi.log` uses write mode `"w"`** in Cell 7, losing prior session's log. Day 110 one-line fix.
+- **`essaysAPI` in api.js is appended after `export default api;`** -- ES module valid, stylistically unconventional. Refactor when api.js next changes.
+- **Test-harness discipline:** see Day 107 entries 1-5, Day 108 entries 5-6, Day 109 entries 1-5. Rules captured in Day 107 section 5.2 and Day 109 section 5.6. Apply to every new cell.
 
 ---
 

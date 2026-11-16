@@ -17,10 +17,11 @@ import uuid
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from lessons.models import TierProgress, WritingFeedback
+from api.serializers import WritingFeedbackSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -139,3 +140,55 @@ def feedback_callback(request):
         {"id": obj.id, "created": False, "detail": "already exists"},
         status=status.HTTP_200_OK,
     )
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def essay_list(request):
+    """List current user's writing feedback, newest first, paginated.
+
+    Tenant isolation: filter(user=request.user). A user cannot see
+    another user's essays even by enumerating IDs -- the queryset is
+    scoped server-side, and WritingFeedbackSerializer is read-only.
+
+    Query params:
+      page       (int, default 1)
+      page_size  (int, default 20, capped at 100)
+
+    Response shape:
+      {count, num_pages, page, page_size, results: [...]}
+    """
+    from django.core.paginator import Paginator
+
+    try:
+        page_num = int(request.query_params.get("page", 1))
+    except (TypeError, ValueError):
+        page_num = 1
+    try:
+        page_size = int(request.query_params.get("page_size", 20))
+    except (TypeError, ValueError):
+        page_size = 20
+    page_size = max(1, min(page_size, 100))
+    page_num = max(1, page_num)
+
+    qs = WritingFeedback.objects.filter(user=request.user).order_by("-created_at")
+    paginator = Paginator(qs, page_size)
+
+    if paginator.num_pages == 0:
+        return Response({
+            "count": 0, "num_pages": 0, "page": 1,
+            "page_size": page_size, "results": [],
+        })
+
+    try:
+        page = paginator.page(page_num)
+    except Exception:
+        page = paginator.page(paginator.num_pages)
+
+    serializer = WritingFeedbackSerializer(page.object_list, many=True)
+    return Response({
+        "count": paginator.count,
+        "num_pages": paginator.num_pages,
+        "page": page.number,
+        "page_size": page_size,
+        "results": serializer.data,
+    })

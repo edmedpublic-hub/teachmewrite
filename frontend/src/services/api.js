@@ -294,3 +294,16 @@ export const handleApiError = (error) => {
 };
 
 export default api;
+
+// ============================================
+// ESSAYS API (Day 109 -- My Essays UI)
+// ============================================
+
+export const essaysAPI = {
+  listEssays: async (page = 1, pageSize = 20) => {
+    const response = await api.get('/v1/writing/essays/', {
+      params: { page, page_size: pageSize },
+    });
+    return response.data;
+  },
+};

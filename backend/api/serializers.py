@@ -8,7 +8,7 @@ from lessons.models import (
     Tier, UserRole,
     # NEW MODELS
     Unit, LessonUnit, QuestionBank, StudentLessonProgress,
-    PracticeSession, TestSession
+    PracticeSession, TestSession, WritingFeedback
 )
 
 # ============================================
@@ -685,3 +685,34 @@ class TestResultSerializer(serializers.Serializer):
     best_score = serializers.FloatField()
     next_lesson_unlocked = serializers.BooleanField()
     next_action = serializers.CharField()
+
+class WritingFeedbackSerializer(serializers.ModelSerializer):
+    """Serialize WritingFeedback rows for the My Essays UI.
+
+    Full read serializer: all fields visible to the authenticated owner.
+    View-level filtering enforces tenant isolation -- a user only receives
+    their own rows (see writing_views.EssayListView).
+
+    `student_text` is the student's own writing. `issues` is Claude's
+    structured feedback. Both are safe for the authenticated owner to read.
+    """
+    tier_at_submission_display = serializers.CharField(
+        source="get_tier_at_submission_display", read_only=True
+    )
+
+    class Meta:
+        model = WritingFeedback
+        fields = [
+            "id",
+            "session_id",
+            "student_text",
+            "level",
+            "tier_at_submission",
+            "tier_at_submission_display",
+            "overall_score",
+            "issues",
+            "rewrite_suggestion",
+            "level_appropriate",
+            "created_at",
+        ]
+        read_only_fields = fields  # all read-only (no client writes)

@@ -18,6 +18,7 @@ const Navbar = () => {
     { path: '/learn', label: 'Learn', icon: '📚' },
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/studio', label: 'Writing Studio', icon: '📝' },
+    { path: '/essays', label: 'My Essays', icon: '📄' },
     { path: '/profile', label: 'Profile', icon: '👤' },
     { path: '/certificates', label: 'Certificates', icon: '🏆' },
   ];
