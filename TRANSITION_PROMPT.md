@@ -1,6 +1,6 @@
 # TeachMeWrite -- Session Transition Prompt
 
-**Last updated:** Day 109 close (2026-11-16)
+**Last updated:** Day 110 close (2026-11-17)
 **Read this first.** Then open `ARCHITECTURE.md` for depth and the latest
 `book/day_NNN.md` for narrative state. `README.md` is the front door.
 
@@ -25,53 +25,61 @@ Three services:
 
 ---
 
-## Current state (Day 109 close)
+## Current state (Day 110 close)
 
-- **Pillar 1 (Auth):** WORKING. Django JWT; Navbar shows actual unlocked tier via `/me/`.
-- **Pillar 2 (AI Feedback):** WORKING. `/studio` -> Cloud Run -> Claude -> render.
-- **Pillar 3 (Persistence):** DEPLOYED Day 109. Cloud Run serving `0c5305b`.
-  - Local E2E proven Day 107 (5/5 callback tests, rows in DB)
-  - Secret Manager migration completed Day 109 (3 Cloud Shell commands)
-  - Deploy run 43727450414 attempt 2 succeeded; promoted to 100% traffic
-  - End-to-end persistence in production still pending Day 110
-    (`DJANGO_API_URL` points at loopback)
-- **"My Essays" UI:** SHIPPED Day 109. `/essays` route, Navbar link,
-  paginated list with per-card expand/collapse. Browser E2E verified.
-- **Live Cloud Run:** `0c5305b` (Day 108's fixes, promoted Day 109)
-- **GitHub main:** HEAD = Day 109 close commit (run `git log --oneline -1`)
-- **Book chapters:** `book/day_100.md` .. `book/day_109.md` (latest)
+- **Pillar 1 (Auth):** WORKING. Django JWT; Navbar shows actual unlocked tier.
+- **Pillar 2 (AI Feedback):** WORKING. /studio -> Cloud Run -> Claude -> render.
+- **Pillar 3 (Persistence):** WORKING END-TO-END IN PRODUCTION (Day 110).
+  - Browser submit -> Cloud Run -> Claude -> BackgroundTask
+  - -> public Django tunnel -> callback auth -> WritingFeedback row
+  - -> row appears in /essays for the submitting user
+  - Browser-verified 2026-11-17: score 42, tier PROFESSIONAL, visible
+  - **Caveat:** Django tunnel URL is ephemeral; `deploy.yml` must be edited
+    each session. Day 111: named tunnel or Django on Cloud Run.
+- **"My Essays" UI:** SHIPPED Day 109. /essays route, Navbar link, paginated.
+- **Live Cloud Run:** `ad575f3` (Day 110's DJANGO_API_URL fix)
+- **GitHub main:** HEAD = Day 110 close commit (run `git log --oneline -1`)
+- **Book chapters:** `book/day_100.md` .. `book/day_110.md` (latest)
+
+**Resume gotcha (Day 110 finding):** gitignored `backend/.env` does not
+arrive in a fresh clone. Before any cell tests a reachable callback,
+write `.env` from the Drive backup:
+
+    /content/drive/MyDrive/teachmewrite-ai/.secrets/internal_api_key
+
+and set `ALLOWED_HOSTS=localhost,127.0.0.1,.trycloudflare.com` +
+`INTERNAL_API_KEY=<value>`.
 
 ---
 
-## Day 110 opening task (30 minutes)
+## Day 111 opening task (60-90 minutes)
 
-**Primary: close end-to-end persistence in production.**
+**Primary: stable Django URL.** The tunnel URL rotates every session; today
+proved the loop closes, but tomorrow's session gets a different URL and
+`deploy.yml` must be edited again. Two options, decision for Day 111:
 
-Point `DJANGO_API_URL` at a reachable Django URL so new essays from
-`/studio` persist and appear in "My Essays." Today (Day 109) the browser
-endpoint works against Cloud Run, but the background task still fails on
-loopback (`127.0.0.1:1/disabled`). New essays return feedback but do not
-persist.
+- **Option A -- Named cloudflared tunnel.** Cloudflare account + a domain
+  (~20 min setup). Stable subdomain, no per-session redeploy. Fastest
+  sustainable fix.
+- **Option B -- Django on Cloud Run.** Multi-hour build: Dockerfile,
+  Postgres, prod settings, secrets management, migrations at startup.
+  Correct long-term answer, Phase 3 scope.
 
-Two options, decision for Day 110:
+Recommendation: A first. B in Phase 3.
 
-- **Option A (fastest):** second cloudflared tunnel for Django :8000,
-  capture the URL, edit `deploy.yml` `DJANGO_API_URL` env var, push,
-  wait for deploy (~6 min). URL rotates each session; requires a
-  redeploy every session. Acceptable to prove the loop once.
-- **Option B (sustainable):** named cloudflared tunnel via Cloudflare
-  account, stable subdomain. One-time setup (~20 min). No per-session
-  redeploy.
+**Also required (from Day 110 debugging):**
 
-Recommendation: A first to prove persistence works end-to-end, then B
-if per-session redeploys become a nuisance. Both are Day 110 work.
+- **Resume pattern must write `.env` before starting Django.** New Cell 4.5
+  (or extend Cell 5) that reads the Drive key + writes
+  `backend/.env` with `ALLOWED_HOSTS` and `INTERNAL_API_KEY`.
 
 **Then (same day or next):**
 
 1. `TierProgress.update_progress()` auto-unlock on tier completion
    (Day 106 finding 1; 15 lines + a test)
 2. `fastapi.log` append mode (Day 107 defect; one-line fix)
-3. Begin Phase 2 UI polish (Days 112-114 scope)
+3. Capture browser E2E screenshot for Day 109/110 retrospective
+4. Begin Phase 2 UI polish (Days 112-114 scope)
 
 ---
 

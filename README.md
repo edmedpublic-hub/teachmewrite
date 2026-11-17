@@ -11,21 +11,22 @@ journey daily, prepare for an AI Engineering role.
 
 ---
 
-## Status (as of Day 109, 2026-11-16)
+## Status (as of Day 110, 2026-11-17)
 
-**Phase 2 (Frontend & UI) -- Day 5 of 50.**
+**Phase 2 (Frontend & UI) -- Day 6 of 50.**
 
 - Pillar 1 (Auth): Django JWT, working. Navbar shows actual unlocked tier via `/me/`.
 - Pillar 2 (AI Feedback): FastAPI on Cloud Run, working end-to-end via /studio.
-- Pillar 3 (Persistence): DEPLOYED Day 109 (Cloud Run serving `0c5305b`).
-  - Local E2E proven Day 107 (5/5 callback tests)
-  - Secret Manager migration completed Day 109 (3 Cloud Shell commands)
-  - Deploy promoted to 100% traffic Day 109 (attempt 2)
-  - End-to-end persistence in production still pending Day 110 (`DJANGO_API_URL`)
+- Pillar 3 (Persistence): **WORKING END-TO-END IN PRODUCTION** as of Day 110.
+  - Browser /studio submission -> Cloud Run /feedback -> Claude
+  - BackgroundTask POST -> public Django tunnel -> callback auth -> row
+  - Row appears in /essays for the submitting user
+  - Browser-verified 2026-11-17: score 42, tier PROFESSIONAL, visible in list
+  - **Caveat:** Django tunnel URL is ephemeral. `deploy.yml` must be edited
+    each session. Day 111: named cloudflared tunnel or Django on Cloud Run.
 - Tier linkage: closed Day 106. `/me/` exposes `current_tier` + `tier_progress`.
-- "My Essays" UI: SHIPPED Day 109. `/essays` route, Navbar link, paginated
-  list with per-card expand/collapse. The user-visible deliverable twice
-  deferred is live.
+- "My Essays" UI: shipped Day 109. `/essays` route, Navbar link, paginated
+  list with per-card expand/collapse.
 
 Day-by-day chapters in `book/day_NNN.md`. The latest chapter is the most
 current picture of state.
@@ -129,13 +130,15 @@ pending, and why.
 
 ---
 
-## Known issues (open as of Day 109)
+## Known issues (open as of Day 110)
 
-- **`DJANGO_API_URL` on Cloud Run points to loopback** (`127.0.0.1:1/disabled`). New essays submitted via /studio in production return feedback to the browser but the background task does not persist. Day 110 work: point at a stable Django tunnel URL.
-- **`TierProgress.update_progress()` does not auto-unlock next tier** when a tier is completed. Day 106 finding, still open. Day 110 fix (15 lines + test).
-- **`fastapi.log` uses write mode `"w"`** in Cell 7, losing prior session's log. Day 110 one-line fix.
+- **Django tunnel URL is ephemeral.** `deploy.yml` line 59's `DJANGO_API_URL` must be edited every session (new tunnel URL). Day 111 fix: named cloudflared tunnel with stable subdomain, or Django on its own Cloud Run service.
+- **`TierProgress.update_progress()` does not auto-unlock next tier** when a tier is completed. Day 106 finding. 15 lines + a test.
+- **`fastapi.log` uses write mode `"w"`** in Cell 7, losing prior session's log. One-line fix (append mode).
+- **Resume pattern does not write `.env` before starting Django.** New Day 110 finding: gitignored `.env` means fresh clones have no `INTERNAL_API_KEY` or `ALLOWED_HOSTS` for `*.trycloudflare.com`. Cell 5 must be preceded by a cell that writes `.env` from the Drive backup (`/content/drive/MyDrive/teachmewrite-ai/.secrets/internal_api_key`).
 - **`essaysAPI` in api.js is appended after `export default api;`** -- ES module valid, stylistically unconventional. Refactor when api.js next changes.
-- **Test-harness discipline:** see Day 107 entries 1-5, Day 108 entries 5-6, Day 109 entries 1-5. Rules captured in Day 107 section 5.2 and Day 109 section 5.6. Apply to every new cell.
+- **No browser E2E screenshots saved to Drive.** Day 109 and Day 110 both have browser evidence only in chat transcript. Screenshot to Drive would survive runtime recycle.
+- **Test-harness discipline:** see Day 107 entries 1-5, Day 108 entries 5-6, Day 109 entries 1-5, Day 110 entries 1-3. Rules captured in Day 107 section 5.2, Day 109 section 5.6, Day 110 section 5.2.
 
 ---
 

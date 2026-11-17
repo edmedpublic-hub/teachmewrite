@@ -1,6 +1,6 @@
 # TeachMeWrite -- System Architecture Map
 
-**Last updated:** Day 109 (2026-11-16)
+**Last updated:** Day 110 (2026-11-17)
 **Scope:** Current state of the running system. What exists, how it connects,
 what is wired vs. built-not-wired.
 
@@ -279,22 +279,22 @@ text
 | 4. JWT decode on FastAPI | WORKS | `JWT_SECRET_KEY` synced with Django's SECRET_KEY |
 | 5. Claude call | WORKS | Haiku; ~3-8s per request |
 | 9. Render feedback | WORKS | Verified Day 105, Day 106, Day 107 |
-| 10. Background POST to Django | **DOES NOT WORK IN PRODUCTION** | `DJANGO_API_URL=http://127.0.0.1:1/disabled` (fail-closed by design) |
-| 10a. `X-Internal-Key` header | **NOT YET SET IN PRODUCTION** | `internal-api-key` secret does not exist in Secret Manager; deploy `0c5305b` failed at step 07 |
-| 11-14. Django callback | **PROVEN LOCALLY ONLY** (Day 107) | 5/5 tests pass; not reachable from Cloud Run |
+| 10. Background POST to Django | **WORKS (Day 110)** | `DJANGO_API_URL` -> public Django tunnel (ephemeral per session) |
+| 10a. `X-Internal-Key` header | **WORKS (Day 109)** | `internal-api-key` in Secret Manager; deploy `ad575f3` green |
+| 11-14. Django callback | **WORKS IN PRODUCTION (Day 110)** | 5/5 tests pass locally; reachable via tunnel; row appeared in /essays |
 
-**What "persistence proven" means precisely:** the Django side works
-end-to-end (5-test suite passed Day 107, cells 6b-3). The FastAPI side
-works (background task fires, correct payload). What is missing is
-network reachability from Cloud Run to Colab's ephemeral Django. Two
-paths to fix:
-- **A. Point Cloud Run at a Django tunnel URL** (Day 109 work). Per-session
-  redeploy cost: ~6 min each time. Not sustainable, but unblocks E2E demo.
-- **B. Deploy Django to its own Cloud Run service** (Phase 3). Sustainable.
-  Requires Dockerfile, migrations at startup, settings for prod, Postgres.
+**Persistence status (Day 110 close): WORKING END-TO-END.**
 
-**Day 109 opens with path A** (fastest to a working demo). Path B is
-Day 110+.
+The loop is closed. Browser submit -> Cloud Run -> Claude -> BackgroundTask
+-> public Django tunnel -> callback auth -> WritingFeedback row -> visible
+in /essays. Verified 2026-11-17 with a real essay (score 42, tier
+PROFESSIONAL).
+
+**Caveat: the Django tunnel URL is ephemeral.** Each new Colab session
+starts a different tunnel, so `deploy.yml` line 59 must be edited with the
+new URL and redeployed. Day 111 fix: named cloudflared tunnel with a stable
+subdomain (one-time Cloudflare account setup) or Django on its own Cloud
+Run service (correct long-term, Phase 3).
 
 ### 2.2 Auth flow (independent of /studio)
 [Login page] -> POST /teach-me-write/api/auth/token/
@@ -337,11 +337,14 @@ connected, not "mostly done."
 
 ### 3.2 Cloud Run -> Django reachability
 
-- **Blocker:** `DJANGO_API_URL=http://127.0.0.1:1/disabled` on Cloud Run.
-  Loopback fails immediately (by design; Day 105 httpbin fix).
-- **Fix (Day 109):** `DJANGO_API_URL` -> stable cloudflared tunnel URL
-  pointing at Colab's `:8000`. Requires per-session redeploy (Day 109's
-  per-session cost). Long-term fix is Django on Cloud Run (Phase 3).
+- **Status:** WORKS as of Day 110 (via public Django tunnel).
+- **Verification:** browser submit -> Cloud Run -> Django tunnel -> callback
+  -> row appeared in /essays for the user (2026-11-17).
+- **Caveat:** tunnel URL is ephemeral. `deploy.yml` must be edited per
+  session. Day 111: named tunnel or Django on Cloud Run.
+- **Django-side requirements** (not committed; gitignored `.env`):
+  `ALLOWED_HOSTS` must include `.trycloudflare.com`, and `INTERNAL_API_KEY`
+  must match the Secret Manager value.
 
 ### 3.3 "My Essays" UI
 
