@@ -164,6 +164,104 @@ memory. (Day 107 entry 4.)
 
 ---
 
+## Roadmap to Day 160
+
+**Outcome by Day 160:** TeachMeWrite ships as a Mastery-Based LMS where:
+
+- A student writes, gets tier-calibrated feedback, sees their own
+  progression over time, and receives a next-step recommendation --
+  for any of the 4 tiers.
+- A teacher sees their students' progression and can assign targeted
+  practice.
+- A parent sees a read-only view of their child's progress and recent
+  submissions.
+- The product runs on production infrastructure (Postgres, Secret Manager,
+  named URL) with monitoring and incident response.
+
+If we are not there by Day 160, the date moves; the outcome does not.
+
+**Planning discipline:** 160 calendar days, approximately 15 percent
+discovery buffer (Days 108 and 110 were each a full day lost to
+infrastructure surprises; assume the rate continues). User testing is a
+parallel track, not a phase task -- sourcing testers starts Day 111.
+
+### Phase 2 (Days 111-124, 14 days) -- product feels whole for all personas
+
+- 111: sustainable Django URL (named tunnel or Cloud Run)
+- 112: progression visibility -- score trend over time on /essays
+- 113: tier-aware /feedback -- tier in schema, prompt calibrates by tier
+- 114: recommendation engine v1 -- areas to improve from aggregated issues
+- 115: update_progress() auto-unlock + permanent resume .env cell
+- 116-117: basic UX polish -- loading, error, empty states
+- 118-119: parent view v1 + multi-tenant permissions
+- 120-121: adaptive Learning E2E (practice to test to mastery)
+- 122: multi-tenant isolation tests
+- 123-124: real user testing round 1 (5 students) -- iterate on feedback
+
+### Phase 3 (Days 125-138, 14 days) -- deepen, then widen
+
+- 125-126: long-term memory (revive Day 93 student_notes.json)
+- 127-128: RAG for curriculum -- feedback grounded in curriculum content
+- 129: individual student model -- tracks struggles, pace, examples that click
+- 130: prompt quality pass + eval loop for tier-aware feedback
+- 131-132: Teacher Dashboard v1
+- 133: Urdu STT (essay dictation)
+- 134: GCP TTS (feedback read-aloud)
+- 135-136: real user testing round 2 (students + teacher + parent)
+- 137: iterate on test feedback
+- 138: Phase 3 retrospective
+
+### Phase 4 (Days 139-150, 12 days) -- eval at scale + fine-tune properly
+
+- 139-140: synthetic data generation (4 tiers, 5 levels, error classes)
+- 141-142: A/B testing framework for prompt variants
+- 143-144: Redis caching (feedback dedupe, tier resolution)
+- 145-147: QLoRA fine-tune properly (data prep, training, eval, deploy)
+- 148: latency + cost analysis
+- 149: load test + scale plan
+- 150: Phase 4 retrospective
+
+### Phase 5 (Days 151-160, 10 days) -- launch readiness
+
+- 151: Postgres migration
+- 152: Secret Manager complete
+- 153: privacy policy + terms of service
+- 154: support channel + monitoring dashboard
+- 155: rollback plan + runbook
+- 156-157: dry-run launch (10 users) -- iterate
+- 158: book compilation (Days 100-160)
+- 159: resume overhaul + mock interviews
+- 160: LAUNCH
+
+### Known risks at 160 days
+
+- User testing rounds slip: 123-124 and 135-136 become iteration days.
+- QLoRA underperforms on golden set: 145-147 consumed without shipping a model.
+- Parent view requires data model changes: UserProfile.linked_students already
+  exists, likely sufficient.
+- Postgres migration surfaces latent SQLite assumptions: 151 slips into 152-153.
+- Discovery days exceed 15 percent buffer: Phase 5 compresses.
+
+### If 160 also slips -- what to cut, in order
+
+1. Urdu STT/TTS (Days 133-134) -- accessibility, not core learning
+2. QLoRA fine-tune (145-147) -- cost optimization, not capability
+3. Dry-run launch (156-157) -- risky cut, survivable with careful monitoring
+
+**Not cut:** user testing, parent view, individual student model, launch
+readiness (privacy, support, rollback). Those four make the product real
+versus built.
+
+### How this changes day-level work
+
+Each day is measured against the outcome statement, not against the day's
+task. If a day is complete but does not move toward the outcome, that day
+is re-scoped. Days 108 and 110 were infrastructure days -- honest, necessary,
+but not outcome days. Expect approximately 20 percent of remaining days to
+be infrastructure, not feature.
+
+---
+
 ## Reference documents
 
 | File | When to open |
