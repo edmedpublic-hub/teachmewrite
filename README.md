@@ -53,6 +53,14 @@ Three deployment targets:
 - **React frontend**: built with Vite, served via `vite preview` + cloudflared tunnel during dev.
 - **FastAPI ai-service**: deployed to Cloud Run `teachmewrite-ai` in `asia-south1`.
 
+At runtime, **two** cloudflared tunnels are active per session:
+
+- **Vite tunnel** (:5173) -- browser-facing app entry point.
+- **Django tunnel** (:8000) -- FastAPI's background-task POST target
+  (DJANGO_API_URL). URL rotates each session; deploy.yml must be edited
+  until the sustainable fix lands.
+
+
 ---
 
 ## Quick start (fresh Colab session)

@@ -10,7 +10,7 @@
 
 TeachMeWrite is a Mastery-Based Learning Management System for Pakistani
 students (Matric through CSS/Competitive exams). Built by Muhammad Afzal,
-AI/ML engineer with 25+ years of English teaching. Day 108 of a 150-day
+AI/ML engineer with 25+ years of English teaching. Day 110 of a 160-day
 engineering capstone: build a competitive AI product, document daily,
 prepare for an AI Engineering role.
 
@@ -22,6 +22,17 @@ Three services:
 - **Backend:** Django 5.2 + DRF, SQLite (local only), port 8000
 - **Frontend:** React 19 + Vite + Tailwind, port 5173, base `/teach-me-write/`
 - **AI-service:** FastAPI on GCP Cloud Run `asia-south1`, calls Claude Haiku
+
+### Runtime topology
+
+Two cloudflared tunnels expose the local services for the day's work:
+
+- Vite tunnel -> :5173 (serves built frontend via vite preview). Browser entry.
+- Django tunnel -> :8000 (serves Django backend). FastAPI's DJANGO_API_URL
+  points at <django-tunnel>/api/v1/writing/feedback-callback/. URL is
+  ephemeral; deploy.yml must be edited every session until the sustainable
+  fix lands.
+
 
 ---
 
