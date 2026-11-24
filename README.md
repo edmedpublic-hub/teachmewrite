@@ -11,9 +11,9 @@ journey daily, prepare for an AI Engineering role.
 
 ---
 
-## Status (as of Day 110, 2026-11-17)
+## Status (as of Day 111, 2026-11-23)
 
-**Phase 2 (Frontend & UI) -- Day 6 of 50.**
+**Phase 2 (Frontend & UI) -- Day 7 of 50.**
 
 - Pillar 1 (Auth): Django JWT, working. Navbar shows actual unlocked tier via `/me/`.
 - Pillar 2 (AI Feedback): FastAPI on Cloud Run, working end-to-end via /studio.
@@ -22,8 +22,13 @@ journey daily, prepare for an AI Engineering role.
   - BackgroundTask POST -> public Django tunnel -> callback auth -> row
   - Row appears in /essays for the submitting user
   - Browser-verified 2026-11-17: score 42, tier PROFESSIONAL, visible in list
-  - **Caveat:** Django tunnel URL is ephemeral. `deploy.yml` must be edited
-    each session. Day 111: named cloudflared tunnel or Django on Cloud Run.
+  - **Day 111: Django tunnel is now named and stable.** Named cloudflared
+    tunnel at `api.teachmewrite.com` (UUID `4cdfe145-...`). DNS CNAME is
+    proxied and persistent; credentials on Drive at `.secrets/cloudflared/`.
+    The Day 110 per-session `deploy.yml` edit is retired.
+  - **Deploy of `83e25e0` pending:** golden-set gate failed 0/20 HTTP 502
+    because the Colab origin was not running at gate time. Day 112 opening:
+    restart origin, confirm Cell 6 401/401, `workflow_dispatch` the run.
 - Tier linkage: closed Day 106. `/me/` exposes `current_tier` + `tier_progress`.
 - "My Essays" UI: shipped Day 109. `/essays` route, Navbar link, paginated
   list with per-card expand/collapse.
@@ -39,7 +44,7 @@ backend/ Django + DRF (auth, curriculum, progress)
 frontend/ React (Vite) + Tailwind CSS
 ai-service/ FastAPI (Cloud Run, calls Claude Haiku)
 .github/workflows/ CI/CD (build, gate, deploy)
-book/ Daily chapters, day_100.md .. day_108.md
+book/ Daily chapters, day_100.md .. day_111.md
 notebooks/ Older Colab notebooks (Days 85-95)
 ARCHITECTURE.md System map (current as of Day 108)
 TRANSITION_PROMPT.md Bootstrap doc for a fresh chat session
@@ -140,7 +145,20 @@ pending, and why.
 
 ## Known issues (open as of Day 110)
 
-- **Django tunnel URL is ephemeral.** `deploy.yml` line 59's `DJANGO_API_URL` must be edited every session (new tunnel URL). Day 111 fix: named cloudflared tunnel with stable subdomain, or Django on its own Cloud Run service.
+- **Django tunnel is now stable (Day 111).** `api.teachmewrite.com` is a
+  named cloudflared tunnel. `deploy.yml` line 59 points at it permanently.
+- **Pre-push probe required.** Any commit that triggers `deploy.yml` must be
+  pushed while `api.teachmewrite.com` answers 401 on `/api/v1/users/me/` and
+  401 on the callback with no `X-Internal-Key`. The golden-set gate calls
+  the ai-service synchronously and fails closed when the origin is down.
+  See `book/day_111.md` section 4, Entry 3.
+- **`urllib` probes need an explicit User-Agent.** Cloudflare Browser
+  Integrity Check returns 403 / `error code: 1010` for the default
+  `Python-urllib/...` UA. `requests` / `httpx` defaults pass. See
+  `book/day_111.md` section 4, Entry 2.
+- **Colab Secrets are not `os.environ`.** Use `google.colab.userdata.get()`,
+  then export to `os.environ` in a shim cell. See `book/day_111.md` section
+  4, Entry 1.
 - **`TierProgress.update_progress()` does not auto-unlock next tier** when a tier is completed. Day 106 finding. 15 lines + a test.
 - **`fastapi.log` uses write mode `"w"`** in Cell 7, losing prior session's log. One-line fix (append mode).
 - **Resume pattern does not write `.env` before starting Django.** New Day 110 finding: gitignored `.env` means fresh clones have no `INTERNAL_API_KEY` or `ALLOWED_HOSTS` for `*.trycloudflare.com`. Cell 5 must be preceded by a cell that writes `.env` from the Drive backup (`/content/drive/MyDrive/teachmewrite-ai/.secrets/internal_api_key`).

@@ -1,6 +1,6 @@
 # TeachMeWrite -- System Architecture Map
 
-**Last updated:** Day 110 (2026-11-17)
+**Last updated:** Day 111 (2026-11-23)
 **Scope:** Current state of the running system. What exists, how it connects,
 what is wired vs. built-not-wired.
 
@@ -279,7 +279,7 @@ text
 | 4. JWT decode on FastAPI | WORKS | `JWT_SECRET_KEY` synced with Django's SECRET_KEY |
 | 5. Claude call | WORKS | Haiku; ~3-8s per request |
 | 9. Render feedback | WORKS | Verified Day 105, Day 106, Day 107 |
-| 10. Background POST to Django | **WORKS (Day 110)** | `DJANGO_API_URL` -> public Django tunnel (ephemeral per session) |
+| 10. Background POST to Django | **WORKS (Day 110); URL stable (Day 111)** | `DJANGO_API_URL` -> `api.teachmewrite.com` (named cloudflared tunnel) |
 | 10a. `X-Internal-Key` header | **WORKS (Day 109)** | `internal-api-key` in Secret Manager; deploy `ad575f3` green |
 | 11-14. Django callback | **WORKS IN PRODUCTION (Day 110)** | 5/5 tests pass locally; reachable via tunnel; row appeared in /essays |
 
@@ -290,11 +290,13 @@ The loop is closed. Browser submit -> Cloud Run -> Claude -> BackgroundTask
 in /essays. Verified 2026-11-17 with a real essay (score 42, tier
 PROFESSIONAL).
 
-**Caveat: the Django tunnel URL is ephemeral.** Each new Colab session
-starts a different tunnel, so `deploy.yml` line 59 must be edited with the
-new URL and redeployed. Day 111 fix: named cloudflared tunnel with a stable
-subdomain (one-time Cloudflare account setup) or Django on its own Cloud
-Run service (correct long-term, Phase 3).
+**Day 111: the Django tunnel URL is now stable.** `api.teachmewrite.com`
+is a named cloudflared tunnel (UUID `4cdfe145-b46f-4a87-ba1a-52105e5d6fbc`).
+DNS is a proxied CNAME to `4cdfe145-...cfargotunnel.com`. Credentials on
+Drive at `.secrets/cloudflared/`. `deploy.yml` line 59 was edited once
+(commit `83e25e0`) and will not be edited again for URL reasons. The
+**origin** behind the tunnel (Colab runserver) is still ephemeral -- see
+section 3.2.
 
 ### 2.2 Auth flow (independent of /studio)
 [Login page] -> POST /teach-me-write/api/auth/token/
@@ -337,14 +339,22 @@ connected, not "mostly done."
 
 ### 3.2 Cloud Run -> Django reachability
 
-- **Status:** WORKS as of Day 110 (via public Django tunnel).
-- **Verification:** browser submit -> Cloud Run -> Django tunnel -> callback
-  -> row appeared in /essays for the user (2026-11-17).
-- **Caveat:** tunnel URL is ephemeral. `deploy.yml` must be edited per
-  session. Day 111: named tunnel or Django on Cloud Run.
+- **Status:** WORKS (Day 110). URL stable (Day 111).
+- **Tunnel:** named cloudflared tunnel `teachmewrite-django`, UUID
+  `4cdfe145-b46f-4a87-ba1a-52105e5d6fbc`. Hostname `api.teachmewrite.com`
+  via proxied CNAME. Credentials on Drive at `.secrets/cloudflared/`.
+  Does not rotate across sessions.
+- **Verification (2026-11-22):** two specific 401s at the stable hostname --
+  `/api/v1/users/me/` unauth -> 401 (DRF message); callback with no
+  `X-Internal-Key` -> 401 (`Missing X-Internal-Key header`).
+- **Constraint:** the origin (Colab runserver + cloudflared) must be
+  running when `deploy.yml` runs its golden-set gate. When the origin is
+  down, Cloudflare returns 502 and the gate fails closed. Pre-push probe
+  required (`book/day_111.md` section 4, Entry 3).
 - **Django-side requirements** (not committed; gitignored `.env`):
-  `ALLOWED_HOSTS` must include `.trycloudflare.com`, and `INTERNAL_API_KEY`
-  must match the Secret Manager value.
+  `ALLOWED_HOSTS` must include both `api.teachmewrite.com` (named tunnel)
+  and `.trycloudflare.com` (Vite quick tunnel still forwards it);
+  `INTERNAL_API_KEY` must match the Secret Manager value.
 
 ### 3.3 "My Essays" UI
 
@@ -425,6 +435,8 @@ connected, not "mostly done."
 | 106 | Tier linkage: /me/ returns current_tier; Navbar shows actual tier | `book/day_106.md` section 1 |
 | 107 | Pillar 3 E2E local: /feedback -> BackgroundTask -> Django row | `book/day_107.md` section 1 |
 | 108 | Deploy pipeline: built image, diagnosed IAM. Not yet completed. | `book/day_108.md` section 1 |
+| 110 | Pillars 1+2+3 E2E in production via ephemeral trycloudflare tunnel | `book/day_110.md` section 1 |
+| 111 | Stable URL: named tunnel `api.teachmewrite.com`, two 401s at the public host; deploy of `83e25e0` gated on origin liveness (0/20 HTTP 502) | `book/day_111.md` section 1 |
 
 **The pattern:** each day proves one layer more than the last. Day 105's
 "E2E" was Pillars 1+2. Day 107's "E2E" was Pillars 1+2+3, locally. Day
