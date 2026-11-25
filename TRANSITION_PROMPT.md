@@ -143,48 +143,12 @@ Credentials: `student_basic/intermediate/advanced/css`, password
 
 ---
 
-## Working conventions (load-bearing)
+## Working conventions and prohibitions
 
-Violating these produces the failure classes we spent Days 105-108 debugging.
-
-1. **One concern per cell.** Even when the next three steps are visible.
-*Especially* then. If the first step fails, the next two are wasted.
-2. **First line of every cell is `# === CELL <id>`.**
-3. **`ast.parse` every code block before delivery.**
-4. **`assert` before `DONE`.** Never print DONE after a conditional that
-could fail. Three failures in one week from this pattern.
-5. **Derive expected values from `git status` / ORM / API.** Never from
-memory. (Day 107 entry 4.)
-6. **`.startswith()` for SHA comparisons.** Never slice. (Day 107 entry 5.)
-7. **ORM for DB verification.** Raw sqlite3 bypasses type conversion
-(UUID `.hex`). (Day 107 entry 1.)
-8. **No secret values in chat.** Never paste back. Rotate if exposed.
-(Day 108 entry 2.)
-9. **Diagnose before edit.** Fetch actual error from logs. Do not guess.
-(Day 108 entry 4.)
-10. **Byte-based size thresholds, not line-based.** Line counts are
- fragile for prose (bash fences, blank-line conventions).
- (Day 108 Cell 16.)
-11. **Book chapter at day's end** with 5 sections (Milestone, Architecture,
- Implementation, Debugging Diary, Key Takeaways). Update README,
- ARCHITECTURE, TRANSITION_PROMPT at milestones.
-12. **Expected-output blocks are prose, not code.** Never paste them as
- code. If a cell fails with `SyntaxError` on a line starting with `[`
- or `---`, the wrong block was pasted.
-
----
-
-## What not to do
-
-- Do not push to `main` without dry-run first
-- Do not commit `backend/.env` or `backend/db.sqlite3`
-- Do not skip the `assert` before DONE
-- Do not run `gcloud auth login` in Colab (EOF on stdin) -- use Cloud Shell
-- Do not pre-decide a fix before seeing the actual log error
-- Do not push through when the end is visible -- stop at clean boundaries
-- Do not paste expected-output blocks as code -- check that first line starts with `# ===`
-
----
+All working conventions, the "What not to do" list, the session
+bootstrap, and the pre-push probe requirements live in `RULES.md`.
+Read `RULES.md` before the first cell of any session. This file does
+not duplicate them.
 
 ## Roadmap to Day 160
 

@@ -170,22 +170,9 @@ pending, and why.
 
 ## Working conventions
 
-These are load-bearing. Violating them produces the failure classes we
-have spent Days 105-108 debugging.
-
-1. **One concern per cell.** Even when the next three steps are visible. Especially then.
-2. **First line of every cell is `# === CELL <id>`.** Enables copy-paste discipline.
-3. **`ast.parse` every code block before delivery.** Catch syntax errors before they run.
-4. **`assert` before `DONE`.** Never print DONE after a conditional that could fail. Three failures in one week from this pattern.
-5. **Derive expected values from `git status` / ORM / API.** Never from memory. Day 107 entry 4.
-6. **`.startswith()` for SHA comparisons.** Never slice. Day 107 entry 5.
-7. **ORM for DB verification.** Raw `sqlite3` bypasses type conversion (UUID `.hex`). Day 107 entry 1.
-8. **No secret values in chat.** Never paste back. Rotate if exposed. Day 108 entry 2.
-9. **Diagnose before edit.** Fetch the actual error from logs. Do not guess. Day 108 entry 4.
-10. **Book chapter at day's end.** Five sections: Milestone, Architecture (Why), Implementation (How), Debugging Diary, Key Takeaways. No exceptions.
-11. **Update README.md, ARCHITECTURE.md, TRANSITION_PROMPT.md at end of day** (or at significant milestones). These files are the memory across sessions -- assistant context does not persist.
-
----
+Working conventions, prohibitions, the session bootstrap, and the
+pre-push probe requirements live in `RULES.md`. Read it before the
+first cell of any session.
 
 ## License
 
