@@ -279,7 +279,13 @@ Do NOT describe the use of Urdu as an "error" — just a language mismatch for t
 3. SCORE BY ERROR COUNT, NOT BY READABILITY.
 Count the CLEAR grammatical errors first, then set the score:
 - ZERO clear errors: 80-95 (adjust within range for length and development)
-- EXTREMELY SHORT BUT CORRECT TEXT (e.g., "Hello."): 70-80 (do not penalize for lack of content)
+- NEAR-EMPTY CORRECT TEXT (a word or phrase, e.g., "Hello." or "Yes, agreed."): 70-80
+  (do not penalize for lack of content)
+- A SHORT BUT SUBSTANTIVE SENTENCE with zero grammar errors stays in 80-95 even if it has
+  redundancy or clarity issues. Redundancy is flagged as a clarity issue per rule 4 but
+  must NOT push the score into the 70-80 near-empty band. Example: "In my opinion, I think
+  this policy is very much necessary" has zero grammar errors and a clarity redundancy -
+  flag the clarity, score 80-95.
 - ONE clear error: 40-55
 - TWO OR MORE clear errors: 20-40
 HARD CAP: if there is ANY clear grammatical error, the score MUST be below 70.
