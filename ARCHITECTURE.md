@@ -1,6 +1,6 @@
 # TeachMeWrite -- System Architecture Map
 
-**Last updated:** Day 111 (2026-11-23)
+**Last updated:** Day 113 (2026-11-26)
 **Scope:** Current state of the running system. What exists, how it connects,
 what is wired vs. built-not-wired.
 
@@ -279,7 +279,7 @@ text
 | 4. JWT decode on FastAPI | WORKS | `JWT_SECRET_KEY` synced with Django's SECRET_KEY |
 | 5. Claude call | WORKS | Haiku; ~3-8s per request |
 | 9. Render feedback | WORKS | Verified Day 105, Day 106, Day 107 |
-| 10. Background POST to Django | **WORKS (Day 110); URL stable (Day 111)** | `DJANGO_API_URL` -> `api.teachmewrite.com` (named cloudflared tunnel) |
+| 10. Background POST to Django | **WORKS (Days 110-113)** | `DJANGO_API_URL` -> `api.teachmewrite.com` (named cloudflared tunnel); live on revision `teachmewrite-ai-00103-ruz` |
 | 10a. `X-Internal-Key` header | **WORKS (Day 109)** | `internal-api-key` in Secret Manager; deploy `ad575f3` green |
 | 11-14. Django callback | **WORKS IN PRODUCTION (Day 110)** | 5/5 tests pass locally; reachable via tunnel; row appeared in /essays |
 
@@ -436,7 +436,8 @@ connected, not "mostly done."
 | 107 | Pillar 3 E2E local: /feedback -> BackgroundTask -> Django row | `book/day_107.md` section 1 |
 | 108 | Deploy pipeline: built image, diagnosed IAM. Not yet completed. | `book/day_108.md` section 1 |
 | 110 | Pillars 1+2+3 E2E in production via ephemeral trycloudflare tunnel | `book/day_110.md` section 1 |
-| 111 | Stable URL: named tunnel `api.teachmewrite.com`, two 401s at the public host; deploy of `83e25e0` gated on origin liveness (0/20 HTTP 502) | `book/day_111.md` section 1 |
+| 111 | Stable URL: named tunnel `api.teachmewrite.com`, two 401s at the public host | `book/day_111.md` section 1 |
+| 113 | Deploy `83e25e0` shipped green (gate 20/20, revision `00103-ruz`, run `45877905216`) after three independent fixes: Secret Manager key, GitHub Actions secret, prompt rule-3 disambiguation | `book/day_113.md` section 1 |
 
 **The pattern:** each day proves one layer more than the last. Day 105's
 "E2E" was Pillars 1+2. Day 107's "E2E" was Pillars 1+2+3, locally. Day
