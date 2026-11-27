@@ -1,6 +1,6 @@
 # TeachMeWrite -- Session Transition Prompt
 
-**Last updated:** Day 111 close (2026-11-23)
+**Last updated:** Day 113 close (2026-11-26)
 **Read this first.** Then open `ARCHITECTURE.md` for depth and the latest
 `book/day_NNN.md` for narrative state. `README.md` is the front door.
 
@@ -41,7 +41,7 @@ and stable (Django); the other is still a quick tunnel (Vite).
 
 ---
 
-## Current state (Day 111 close)
+## Current state (Day 113 close)
 
 - **Pillar 1 (Auth):** WORKING. Django JWT; Navbar shows actual unlocked tier.
 - **Pillar 2 (AI Feedback):** WORKING. /studio -> Cloud Run -> Claude -> render.
@@ -53,11 +53,12 @@ and stable (Django); the other is still a quick tunnel (Vite).
     - **Day 111: Django tunnel is named and stable.** `api.teachmewrite.com`.
     Per-session `deploy.yml` edit retired. Commit `83e25e0`.
 - **"My Essays" UI:** SHIPPED Day 109. /essays route, Navbar link, paginated.
-- **Live Cloud Run:** `ad575f3` (Day 110). Deploy of `83e25e0` failed
-  golden-set gate 0/20 HTTP 502 (origin not running at gate time).
-  Day 112 action: restart origin, confirm Cell 6 401/401, `workflow_dispatch`.
+- **Live Cloud Run:** `1d9a2e1` (Day 113) — revision `teachmewrite-ai-00103-ruz`
+  at 100% traffic. Gate 20/20, run `45877905216`. `83e25e0` shipped Days
+  111-113 after three independent fixes: Secret Manager key, GitHub Actions
+  secret, and prompt rule-3 disambiguation for case `g13`.
 - **GitHub main:** HEAD = Day 110 close commit (run `git log --oneline -1`)
-- **Book chapters:** `book/day_100.md` .. `book/day_111.md` (latest)
+- **Book chapters:** `book/day_100.md` .. `book/day_113.md` (latest)
 
 **Resume gotchas (Days 110-111 findings):**
 
@@ -81,37 +82,31 @@ api.teachmewrite.com` + `INTERNAL_API_KEY=<value>`.
 
 ---
 
-## Day 112 opening task (60-90 minutes)
+## Day 114 opening task (60-90 minutes)
 
-**Primary: deploy `83e25e0` green, then browser E2E on the stable host.**
-The URL change landed 2026-11-22 (commit `83e25e0`); the deploy failed
-golden-set gate 0/20 with HTTP 502 because the Colab origin was not running
-at gate time. Fix is origin restart + `workflow_dispatch`, not a code
-change. See `book/day_111.md` section 4, Entry 3.
+**Primary: browser E2E on the promoted revision.** The stable URL is live
+and the gate is green; the last unproven link is the real browser path
+against `api.teachmewrite.com`. See `book/day_113.md` section 5.6.
 
-1. **Restart origin.** Cells 2.5 through 4.8 of the resume pattern
-   (Colab Secrets shim, clone, `.env`, pip, migrate, runserver).
-2. **Bring up the named tunnel.** Cell 5. Expect three
-   `Registered tunnel connection` lines.
-3. **Pre-push probe.** Cell 6. Two specific 401s at
-   `https://api.teachmewrite.com`. `User-Agent` header required
-   (`book/day_111.md` section 4, Entry 2).
-4. **`workflow_dispatch` `83e25e0`.** Watch the Actions run reach green.
-5. **Browser E2E.** Vite preview + Vite tunnel, log in as `student_css`,
-   submit an essay at `/studio`, verify the row appears in `/essays`,
-   confirm in devtools that the callback URL is `api.teachmewrite.com`,
-   not `*.trycloudflare.com`.
+1. **Bootstrap.** Cell 0 (Colab Secrets, Git identity, repo at HEAD).
+2. **Origin restart.** Cell 0.6 (`.env` from Drive, pip, migrate,
+   runserver, named tunnel, two 401s at `api.teachmewrite.com`).
+3. **Vite preview + Vite tunnel.** Build the frontend, start preview,
+   open the Vite tunnel, log in as `student_css` / `testpass123`.
+4. **Browser E2E.** Submit an essay at `/studio`, wait for feedback,
+   open `/essays`, confirm the card appears, and in devtools confirm the
+   background callback URL is `api.teachmewrite.com`, not
+   `*.trycloudflare.com`.
+5. **Screenshot to Drive.** Save the `/essays` page to
+   `/content/drive/MyDrive/teachmewrite-ai/artifacts/day_114_e2e.png`.
 
 **Then (same day or next):**
 
-1. Extract `RULES.md` as the sole home of working conventions; reduce
-   `TRANSITION_PROMPT.md` and `README.md` to one-line pointers.
-   Commit as a separate change (convention 13).
-2. `TierProgress.update_progress()` auto-unlock on tier completion
+1. `TierProgress.update_progress()` auto-unlock on tier completion
    (Day 106 finding 1; 15 lines + a test).
-3. `fastapi.log` append mode (Day 107 defect; one-line fix).
-4. Capture browser E2E screenshot to Drive.
-5. Begin Phase 2 UI polish (Days 112-114 scope).
+2. `fastapi.log` append mode (Day 107 defect; one-line fix).
+3. Add Haiku 5.5 migration as its own commit with its own gate run.
+4. Begin Phase 2 UI polish (Days 114-117 scope).
 
 
 ---
