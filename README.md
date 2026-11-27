@@ -11,9 +11,9 @@ journey daily, prepare for an AI Engineering role.
 
 ---
 
-## Status (as of Day 111, 2026-11-23)
+## Status (as of Day 113, 2026-11-26)
 
-**Phase 2 (Frontend & UI) -- Day 7 of 50.**
+**Phase 2 (Frontend & UI) -- Day 9 of 50.**
 
 - Pillar 1 (Auth): Django JWT, working. Navbar shows actual unlocked tier via `/me/`.
 - Pillar 2 (AI Feedback): FastAPI on Cloud Run, working end-to-end via /studio.
@@ -26,9 +26,12 @@ journey daily, prepare for an AI Engineering role.
     tunnel at `api.teachmewrite.com` (UUID `4cdfe145-...`). DNS CNAME is
     proxied and persistent; credentials on Drive at `.secrets/cloudflared/`.
     The Day 110 per-session `deploy.yml` edit is retired.
-  - **Deploy of `83e25e0` pending:** golden-set gate failed 0/20 HTTP 502
-    because the Colab origin was not running at gate time. Day 112 opening:
-    restart origin, confirm Cell 6 401/401, `workflow_dispatch` the run.
+  - **Deploy of `83e25e0` shipped on Day 113** (run `45877905216`, revision
+    `teachmewrite-ai-00103-ruz`, gate 20/20, promoted to 100% traffic).
+    The gate failures between Days 111 and 113 were three independent
+    causes: a stale Anthropic key in Secret Manager, a second stale copy
+    in GitHub Actions secrets, and a genuine prompt ambiguity for golden
+    case `g13`. See `book/day_113.md`.
 - Tier linkage: closed Day 106. `/me/` exposes `current_tier` + `tier_progress`.
 - "My Essays" UI: shipped Day 109. `/essays` route, Navbar link, paginated
   list with per-card expand/collapse.
@@ -44,7 +47,7 @@ backend/ Django + DRF (auth, curriculum, progress)
 frontend/ React (Vite) + Tailwind CSS
 ai-service/ FastAPI (Cloud Run, calls Claude Haiku)
 .github/workflows/ CI/CD (build, gate, deploy)
-book/ Daily chapters, day_100.md .. day_111.md
+book/ Daily chapters, day_100.md .. day_113.md
 notebooks/ Older Colab notebooks (Days 85-95)
 ARCHITECTURE.md System map (current as of Day 108)
 TRANSITION_PROMPT.md Bootstrap doc for a fresh chat session
@@ -145,7 +148,7 @@ pending, and why.
 
 ## Known issues (open as of Day 110)
 
-- **Django tunnel is now stable (Day 111).** `api.teachmewrite.com` is a
+- **Django tunnel is stable and shipping (Days 111-113).** `api.teachmewrite.com` is a
   named cloudflared tunnel. `deploy.yml` line 59 points at it permanently.
 - **Pre-push probe required.** Any commit that triggers `deploy.yml` must be
   pushed while `api.teachmewrite.com` answers 401 on `/api/v1/users/me/` and
